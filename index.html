@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盈聚．天下 II 建議書數據儀表板</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- react-is 解決 Recharts 依賴錯誤 -->
+    <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
+    <!-- Babel 用於在瀏覽器編譯 JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Recharts 圖表庫 -->
+    <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.1.9/umd/Recharts.js"></script>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+        const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceArea } = window.Recharts;
+
+        // SVG 圖標組件
+        const Icon = ({ path, className = "w-6 h-6", color = "currentColor" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <g dangerouslySetInnerHTML={{ __html: path }} />
+            </svg>
+        );
+
+        const icons = {
+            ShieldCheck: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+            PiggyBank: '<path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.5-1 2-1.5L22 12l-1.5-1.5L19 12V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/>',
+            ArrowRightLeft: '<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>',
+            TrendingUp: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+            Coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
+            Eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+            EyeOff: '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
+            RefreshCw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+            Activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+            Users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+            ArrowLeft: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+            Coffee: '<path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/>',
+            GraduationCap: '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+            Diamond: '<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
+            Star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+            Info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+            Target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'
+        };
+
+        // 1歲教育儲蓄方案數據 (5年供款, 每年 USD 13,000)
+        const dataEducation1 = [
+            { age: 2, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 3, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
+            { age: 4, prem: 13000, w: 0, a: 3473, b: 1874, c: 11388, d: 0, total: 16736 },
+            { age: 5, prem: 13000, w: 0, a: 9753, b: 3449, c: 12025, d: 0, total: 25227 },
+            { age: 6, prem: 13000, w: 0, a: 18437, b: 5037, c: 15171, d: 0, total: 38645 },
+            { age: 7, prem: 0, w: 0, a: 33533, b: 6637, c: 24830, d: 0, total: 65001 },
+            { age: 11, prem: 0, w: 0, a: 41017, b: 13167, c: 31707, d: 0, total: 85892 },
+            { age: 16, prem: 0, w: 0, a: 50868, b: 21628, c: 50362, d: 0, total: 122859 },
+            { age: 19, prem: 0, w: 0, a: 65059, b: 26869, c: 63960, d: 0, total: 155889 },
+            { age: 20, prem: 0, w: 50000, a: 55281, b: 0, c: 64762, d: 0, total: 120044 },
+            { age: 21, prem: 0, w: 50000, a: 34961, b: 0, c: 48567, d: 0, total: 83529 },
+            { age: 22, prem: 0, w: 50000, a: 15982, b: 0, c: 25337, d: 0, total: 41320 },
+            { age: 23, prem: 0, w: 0, a: 16009, b: 382, c: 28866, d: 0, total: 45257 },
+            { age: 26, prem: 0, w: 0, a: 16105, b: 1546, c: 42230, d: 0, total: 59883 },
+            { age: 31, prem: 0, w: 0, a: 16494, b: 3551, c: 64686, d: 0, total: 84732 },
+            { age: 36, prem: 0, w: 0, a: 16854, b: 5636, c: 96396, d: 0, total: 118887 },
+            { age: 41, prem: 0, w: 0, a: 17404, b: 7807, c: 140582, d: 0, total: 165793 },
+            { age: 51, prem: 0, w: 0, a: 17868, b: 12416, c: 288230, d: 0, total: 318516 },
+            { age: 61, prem: 0, w: 0, a: 18392, b: 17408, c: 570000, d: 0, total: 605801 },
+            { age: 71, prem: 0, w: 0, a: 19047, b: 22814, c: 1103870, d: 0, total: 1145731 },
+            { age: 81, prem: 0, w: 0, a: 19865, b: 28668, c: 2111427, d: 0, total: 2159961 },
+            { age: 91, prem: 0, w: 0, a: 20716, b: 35007, c: 4008858, d: 0, total: 4064582 },
+            { age: 101, prem: 0, w: 0, a: 21796, b: 41873, c: 7576981, d: 0, total: 7640650 },
+            { age: 138, prem: 0, w: 0, a: 24540, b: 72608, c: 78570745, d: 0, total: 78667894 }
+        ];
+
+        // 30歲退休數據
+        const data30 = [
+            { age: 31, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 32, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
+            { age: 33, prem: 13000, w: 0, a: 3473, b: 1874, c: 11388, d: 0, total: 16736 },
+            { age: 34, prem: 13000, w: 0, a: 9753, b: 3449, c: 12025, d: 0, total: 25227 },
+            { age: 35, prem: 13000, w: 0, a: 18437, b: 5037, c: 15171, d: 0, total: 38645 },
+            { age: 36, prem: 0, w: 0, a: 33533, b: 6637, c: 24830, d: 0, total: 65001 },
+            { age: 40, prem: 0, w: 0, a: 41017, b: 13167, c: 31707, d: 0, total: 85892 },
+            { age: 45, prem: 0, w: 0, a: 50868, b: 21628, c: 50362, d: 0, total: 122859 },
+            { age: 50, prem: 0, w: 0, a: 65178, b: 30433, c: 90545, d: 0, total: 186157 },
+            { age: 55, prem: 0, w: 0, a: 65751, b: 39596, c: 172406, d: 0, total: 277753 },
+            { age: 60, prem: 0, w: 0, a: 67338, b: 49131, c: 264082, d: 0, total: 380551 },
+            { age: 61, prem: 0, w: 27000, a: 67471, b: 24084, c: 286728, d: 0, total: 378284 },
+            { age: 62, prem: 0, w: 27000, a: 67397, b: 0, c: 308487, d: 0, total: 375885 },
+            { age: 63, prem: 0, w: 27000, a: 63521, b: 0, c: 309797, d: 0, total: 373318 },
+            { age: 64, prem: 0, w: 27000, a: 59855, b: 0, c: 310728, d: 0, total: 370584 },
+            { age: 65, prem: 0, w: 27000, a: 56391, b: 0, c: 311280, d: 0, total: 367671 },
+            { age: 66, prem: 0, w: 27000, a: 53015, b: 0, c: 311555, d: 0, total: 364570 },
+            { age: 67, prem: 0, w: 27000, a: 50025, b: 0, c: 311242, d: 0, total: 361267 },
+            { age: 68, prem: 0, w: 27000, a: 47194, b: 0, c: 310555, d: 0, total: 357750 },
+            { age: 69, prem: 0, w: 27000, a: 44346, b: 0, c: 309657, d: 0, total: 354003 },
+            { age: 70, prem: 0, w: 27000, a: 41884, b: 0, c: 308130, d: 0, total: 350014 },
+            { age: 71, prem: 0, w: 27000, a: 39291, b: 0, c: 306473, d: 0, total: 345765 },
+            { age: 72, prem: 0, w: 27000, a: 36853, b: 0, c: 304386, d: 0, total: 341239 },
+            { age: 73, prem: 0, w: 27000, a: 34561, b: 0, c: 301858, d: 0, total: 336420 },
+            { age: 74, prem: 0, w: 27000, a: 32406, b: 0, c: 298881, d: 0, total: 331287 },
+            { age: 75, prem: 0, w: 27000, a: 30380, b: 0, c: 295441, d: 0, total: 325821 },
+            { age: 76, prem: 0, w: 27000, a: 28475, b: 0, c: 291524, d: 0, total: 319999 },
+            { age: 77, prem: 0, w: 27000, a: 26684, b: 0, c: 287114, d: 0, total: 313799 },
+            { age: 78, prem: 0, w: 27000, a: 25038, b: 0, c: 282158, d: 0, total: 307196 },
+            { age: 79, prem: 0, w: 27000, a: 23462, b: 0, c: 276702, d: 0, total: 300164 },
+            { age: 80, prem: 0, w: 27000, a: 21980, b: 0, c: 270695, d: 0, total: 292675 },
+            { age: 81, prem: 0, w: 27000, a: 20586, b: 0, c: 264112, d: 0, total: 284699 },
+            { age: 82, prem: 0, w: 27000, a: 19275, b: 0, c: 256928, d: 0, total: 276204 },
+            { age: 83, prem: 0, w: 27000, a: 18043, b: 0, c: 249114, d: 0, total: 267157 },
+            { age: 84, prem: 0, w: 27000, a: 16914, b: 0, c: 240608, d: 0, total: 257523 },
+            { age: 85, prem: 0, w: 27000, a: 15822, b: 0, c: 231440, d: 0, total: 247262 },
+            { age: 86, prem: 0, w: 27000, a: 14794, b: 0, c: 221539, d: 0, total: 236334 },
+            { age: 87, prem: 0, w: 27000, a: 13828, b: 0, c: 210867, d: 0, total: 224696 },
+            { age: 88, prem: 0, w: 27000, a: 12920, b: 0, c: 199381, d: 0, total: 212301 },
+            { age: 89, prem: 0, w: 27000, a: 12065, b: 0, c: 187035, d: 0, total: 199100 },
+            { age: 90, prem: 0, w: 27000, a: 11261, b: 0, c: 173780, d: 0, total: 185042 },
+            { age: 91, prem: 0, w: 27000, a: 10505, b: 0, c: 159564, d: 0, total: 170070 },
+            { age: 92, prem: 0, w: 27000, a: 9794, b: 0, c: 144330, d: 0, total: 154124 },
+            { age: 93, prem: 0, w: 27000, a: 9133, b: 0, c: 128009, d: 0, total: 137142 },
+            { age: 94, prem: 0, w: 27000, a: 8510, b: 0, c: 110546, d: 0, total: 119057 },
+            { age: 95, prem: 0, w: 27000, a: 7924, b: 0, c: 91871, d: 0, total: 99795 },
+            { age: 96, prem: 0, w: 0, a: 7952, b: 162, c: 98168, d: 0, total: 106282 },
+            { age: 100, prem: 0, w: 0, a: 8077, b: 823, c: 127828, d: 0, total: 136728 },
+            { age: 110, prem: 0, w: 0, a: 8424, b: 2571, c: 245663, d: 0, total: 256658 },
+            { age: 120, prem: 0, w: 0, a: 8784, b: 4464, c: 468534, d: 0, total: 481784 },
+            { age: 130, prem: 0, w: 0, a: 9242, b: 6515, c: 888617, d: 0, total: 904375 },
+            { age: 138, prem: 0, w: 0, a: 9482, b: 8277, c: 1478976, d: 0, total: 1496737 }
+        ];
+
+        // 40歲退休數據
+        const data40 = [
+            { age: 41, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 42, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
+            { age: 43, prem: 13000, w: 0, a: 3473, b: 1874, c: 11388, d: 0, total: 16736 },
+            { age: 44, prem: 13000, w: 0, a: 9753, b: 3449, c: 12025, d: 0, total: 25227 },
+            { age: 45, prem: 13000, w: 0, a: 18437, b: 5037, c: 15171, d: 0, total: 38645 },
+            { age: 46, prem: 0, w: 0, a: 33533, b: 6637, c: 24830, d: 0, total: 65001 },
+            { age: 50, prem: 0, w: 0, a: 41017, b: 13167, c: 31707, d: 0, total: 85892 },
+            { age: 55, prem: 0, w: 0, a: 50868, b: 21628, c: 50362, d: 0, total: 122859 },
+            { age: 60, prem: 0, w: 0, a: 65178, b: 30433, c: 90545, d: 0, total: 186157 },
+            { age: 64, prem: 0, w: 0, a: 65610, b: 37734, c: 152100, d: 0, total: 255444 },
+            { age: 65, prem: 0, w: 0, a: 65751, b: 39596, c: 172406, d: 0, total: 277753 },
+            { age: 66, prem: 0, w: 20000, a: 66803, b: 21473, c: 187538, d: 0, total: 275814 },
+            { age: 67, prem: 0, w: 20000, a: 66937, b: 3204, c: 203604, d: 0, total: 273746 },
+            { age: 68, prem: 0, w: 20000, a: 63556, b: 0, c: 207983, d: 0, total: 271539 },
+            { age: 69, prem: 0, w: 20000, a: 59669, b: 0, c: 209520, d: 0, total: 269189 },
+            { age: 70, prem: 0, w: 20000, a: 56005, b: 0, c: 210681, d: 0, total: 266687 },
+            { age: 71, prem: 0, w: 20000, a: 52554, b: 0, c: 211467, d: 0, total: 264021 },
+            { age: 72, prem: 0, w: 20000, a: 49303, b: 0, c: 211879, d: 0, total: 261183 },
+            { age: 73, prem: 0, w: 20000, a: 46426, b: 0, c: 211734, d: 0, total: 258160 },
+            { age: 74, prem: 0, w: 20000, a: 43705, b: 0, c: 211235, d: 0, total: 254940 },
+            { age: 75, prem: 0, w: 20000, a: 41132, b: 0, c: 210378, d: 0, total: 251511 },
+            { age: 76, prem: 0, w: 20000, a: 38627, b: 0, c: 209232, d: 0, total: 247860 },
+            { age: 77, prem: 0, w: 20000, a: 36405, b: 0, c: 207565, d: 0, total: 243971 },
+            { age: 78, prem: 0, w: 20000, a: 34302, b: 0, c: 205526, d: 0, total: 239829 },
+            { age: 79, prem: 0, w: 20000, a: 32188, b: 0, c: 203229, d: 0, total: 235418 },
+            { age: 80, prem: 0, w: 20000, a: 30356, b: 0, c: 200363, d: 0, total: 230720 },
+            { age: 81, prem: 0, w: 20000, a: 28433, b: 0, c: 197283, d: 0, total: 225717 },
+            { age: 82, prem: 0, w: 20000, a: 26624, b: 0, c: 193764, d: 0, total: 220388 },
+            { age: 83, prem: 0, w: 20000, a: 24923, b: 0, c: 189790, d: 0, total: 214713 },
+            { age: 84, prem: 0, w: 20000, a: 23324, b: 0, c: 185346, d: 0, total: 208670 },
+            { age: 85, prem: 0, w: 20000, a: 21820, b: 0, c: 180413, d: 0, total: 202233 },
+            { age: 86, prem: 0, w: 20000, a: 20406, b: 0, c: 174972, d: 0, total: 195379 },
+            { age: 87, prem: 0, w: 20000, a: 19077, b: 0, c: 169000, d: 0, total: 188078 },
+            { age: 88, prem: 0, w: 20000, a: 17854, b: 0, c: 162449, d: 0, total: 180303 },
+            { age: 89, prem: 0, w: 20000, a: 16684, b: 0, c: 155339, d: 0, total: 172023 },
+            { age: 90, prem: 0, w: 20000, a: 15583, b: 0, c: 147621, d: 0, total: 163205 },
+            { age: 91, prem: 0, w: 20000, a: 14548, b: 0, c: 139265, d: 0, total: 153813 },
+            { age: 92, prem: 0, w: 20000, a: 13574, b: 0, c: 130236, d: 0, total: 143811 },
+            { age: 93, prem: 0, w: 20000, a: 12658, b: 0, c: 120500, d: 0, total: 133159 },
+            { age: 94, prem: 0, w: 20000, a: 11819, b: 0, c: 109995, d: 0, total: 121814 },
+            { age: 95, prem: 0, w: 20000, a: 11007, b: 0, c: 98724, d: 0, total: 109732 },
+            { age: 96, prem: 0, w: 0, a: 11037, b: 231, c: 105595, d: 0, total: 116864 },
+            { age: 100, prem: 0, w: 0, a: 11156, b: 1177, c: 138008, d: 0, total: 150342 },
+            { age: 110, prem: 0, w: 0, a: 11553, b: 3678, c: 266982, d: 0, total: 282214 },
+            { age: 120, prem: 0, w: 0, a: 12049, b: 6386, c: 511318, d: 0, total: 529754 },
+            { age: 130, prem: 0, w: 0, a: 12565, b: 9319, c: 972537, d: 0, total: 994421 },
+            { age: 138, prem: 0, w: 0, a: 13081, b: 11839, c: 1620842, d: 0, total: 1645764 }
+        ];
+
+        // 50歲退休數據
+        const data50 = [
+            { age: 51, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 52, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
+            { age: 53, prem: 13000, w: 0, a: 3473, b: 1874, c: 11388, d: 0, total: 16736 },
+            { age: 54, prem: 13000, w: 0, a: 9753, b: 3449, c: 12025, d: 0, total: 25227 },
+            { age: 55, prem: 13000, w: 0, a: 18437, b: 5037, c: 15171, d: 0, total: 38645 },
+            { age: 56, prem: 0, w: 0, a: 33533, b: 6637, c: 24830, d: 0, total: 65001 },
+            { age: 60, prem: 0, w: 0, a: 41017, b: 13167, c: 31707, d: 0, total: 85892 },
+            { age: 65, prem: 0, w: 0, a: 50868, b: 21628, c: 50362, d: 0, total: 122859 },
+            { age: 70, prem: 0, w: 0, a: 65178, b: 30433, c: 90545, d: 0, total: 186157 },
+            { age: 71, prem: 0, w: 16000, a: 65247, b: 16236, c: 103441, d: 0, total: 184925 },
+            { age: 72, prem: 0, w: 16000, a: 65358, b: 1926, c: 117845, d: 0, total: 185130 },
+            { age: 73, prem: 0, w: 16000, a: 61376, b: 0, c: 125595, d: 0, total: 186972 },
+            { age: 74, prem: 0, w: 16000, a: 57118, b: 0, c: 132413, d: 0, total: 189532 },
+            { age: 75, prem: 0, w: 16000, a: 53199, b: 0, c: 133466, d: 0, total: 186665 },
+            { age: 76, prem: 0, w: 16000, a: 50179, b: 0, c: 132619, d: 0, total: 182798 },
+            { age: 77, prem: 0, w: 16000, a: 46626, b: 0, c: 132054, d: 0, total: 178680 },
+            { age: 78, prem: 0, w: 16000, a: 43273, b: 0, c: 131021, d: 0, total: 174294 },
+            { age: 79, prem: 0, w: 16000, a: 40110, b: 0, c: 129513, d: 0, total: 169623 },
+            { age: 80, prem: 0, w: 16000, a: 37128, b: 0, c: 127521, d: 0, total: 164649 },
+            { age: 81, prem: 0, w: 16000, a: 34317, b: 0, c: 125033, d: 0, total: 159351 },
+            { age: 82, prem: 0, w: 16000, a: 31670, b: 0, c: 122039, d: 0, total: 153709 },
+            { age: 83, prem: 0, w: 16000, a: 29291, b: 0, c: 118408, d: 0, total: 147700 },
+            { age: 84, prem: 0, w: 16000, a: 27040, b: 0, c: 114260, d: 0, total: 141301 },
+            { age: 85, prem: 0, w: 16000, a: 24909, b: 0, c: 109576, d: 0, total: 134485 },
+            { age: 86, prem: 0, w: 16000, a: 22848, b: 0, c: 104378, d: 0, total: 127227 },
+            { age: 87, prem: 0, w: 16000, a: 20985, b: 0, c: 98511, d: 0, total: 119496 },
+            { age: 88, prem: 0, w: 16000, a: 19216, b: 0, c: 92047, d: 0, total: 111264 },
+            { age: 89, prem: 0, w: 16000, a: 17473, b: 0, c: 85023, d: 0, total: 102496 },
+            { age: 90, prem: 0, w: 16000, a: 15912, b: 0, c: 77246, d: 0, total: 93158 },
+            { age: 91, prem: 0, w: 16000, a: 14334, b: 0, c: 68879, d: 0, total: 83213 },
+            { age: 92, prem: 0, w: 16000, a: 12848, b: 0, c: 59774, d: 0, total: 72622 },
+            { age: 93, prem: 0, w: 16000, a: 11450, b: 0, c: 49892, d: 0, total: 61343 },
+            { age: 94, prem: 0, w: 16000, a: 10134, b: 0, c: 39196, d: 0, total: 49330 },
+            { age: 95, prem: 0, w: 16000, a: 8896, b: 0, c: 27640, d: 0, total: 36537 },
+            { age: 96, prem: 0, w: 0, a: 8917, b: 192, c: 29801, d: 0, total: 38912 },
+            { age: 100, prem: 0, w: 0, a: 9023, b: 980, c: 40055, d: 0, total: 50059 },
+            { age: 110, prem: 0, w: 0, a: 9287, b: 3062, c: 81617, d: 0, total: 93967 },
+            { age: 120, prem: 0, w: 0, a: 9618, b: 5316, c: 161455, d: 0, total: 176390 },
+            { age: 130, prem: 0, w: 0, a: 10031, b: 7758, c: 313319, d: 0, total: 331109 },
+            { age: 138, prem: 0, w: 0, a: 10378, b: 9856, c: 527748, d: 0, total: 547984 }
+        ];
+
+        // 55歲退休數據
+        const data55 = [
+            { age: 56, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 57, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
+            { age: 58, prem: 13000, w: 0, a: 3473, b: 1874, c: 11388, d: 0, total: 16736 },
+            { age: 59, prem: 13000, w: 0, a: 9753, b: 3449, c: 12025, d: 0, total: 25227 },
+            { age: 60, prem: 13000, w: 0, a: 18437, b: 5037, c: 15171, d: 0, total: 38645 },
+            { age: 61, prem: 0, w: 0, a: 33533, b: 6637, c: 24830, d: 0, total: 65001 },
+            { age: 65, prem: 0, w: 0, a: 41017, b: 13167, c: 31707, d: 0, total: 85892 },
+            { age: 70, prem: 0, w: 0, a: 50868, b: 21628, c: 50362, d: 0, total: 122859 },
+            { age: 71, prem: 0, w: 12000, a: 56995, b: 11361, c: 52156, d: 0, total: 120513 },
+            { age: 72, prem: 0, w: 12000, a: 65009, b: 1012, c: 53339, d: 0, total: 119361 },
+            { age: 73, prem: 0, w: 12000, a: 60309, b: 0, c: 59290, d: 0, total: 119600 },
+            { age: 74, prem: 0, w: 12000, a: 55501, b: 0, c: 65021, d: 0, total: 120522 },
+            { age: 75, prem: 0, w: 12000, a: 51089, b: 0, c: 70972, d: 0, total: 122061 },
+            { age: 76, prem: 0, w: 12000, a: 46974, b: 0, c: 74471, d: 0, total: 121446 },
+            { age: 77, prem: 0, w: 12000, a: 43174, b: 0, c: 77845, d: 0, total: 121019 },
+            { age: 78, prem: 0, w: 12000, a: 39653, b: 0, c: 81142, d: 0, total: 120795 },
+            { age: 79, prem: 0, w: 12000, a: 36400, b: 0, c: 83627, d: 0, total: 120028 },
+            { age: 80, prem: 0, w: 12000, a: 33405, b: 0, c: 82425, d: 0, total: 115830 },
+            { age: 81, prem: 0, w: 12000, a: 30995, b: 0, c: 80363, d: 0, total: 111359 },
+            { age: 82, prem: 0, w: 12000, a: 28279, b: 0, c: 78318, d: 0, total: 106597 },
+            { age: 83, prem: 0, w: 12000, a: 25715, b: 0, c: 75811, d: 0, total: 101526 },
+            { age: 84, prem: 0, w: 12000, a: 23295, b: 0, c: 72830, d: 0, total: 96125 },
+            { age: 85, prem: 0, w: 12000, a: 21013, b: 0, c: 69360, d: 0, total: 90374 },
+            { age: 86, prem: 0, w: 12000, a: 18862, b: 0, c: 65386, d: 0, total: 84248 },
+            { age: 87, prem: 0, w: 12000, a: 16834, b: 0, c: 60889, d: 0, total: 77724 },
+            { age: 88, prem: 0, w: 12000, a: 14983, b: 0, c: 55793, d: 0, total: 70776 },
+            { age: 89, prem: 0, w: 12000, a: 13227, b: 0, c: 50149, d: 0, total: 63377 },
+            { age: 90, prem: 0, w: 12000, a: 11564, b: 0, c: 43932, d: 0, total: 55496 },
+            { age: 91, prem: 0, w: 0, a: 11609, b: 262, c: 47232, d: 0, total: 59103 },
+            { age: 95, prem: 0, w: 0, a: 11941, b: 1332, c: 62761, d: 0, total: 76035 },
+            { age: 96, prem: 0, w: 0, a: 11970, b: 1604, c: 67401, d: 0, total: 80977 },
+            { age: 100, prem: 0, w: 0, a: 12087, b: 2718, c: 89368, d: 0, total: 104174 },
+            { age: 110, prem: 0, w: 0, a: 12451, b: 5662, c: 177436, d: 0, total: 195550 },
+            { age: 120, prem: 0, w: 0, a: 12821, b: 8849, c: 345402, d: 0, total: 367074 },
+            { age: 130, prem: 0, w: 0, a: 13338, b: 12302, c: 663409, d: 0, total: 689049 },
+            { age: 138, prem: 0, w: 0, a: 13809, b: 15269, c: 1111295, d: 0, total: 1140374 }
+        ];
+
+        // 60歲傳承方案數據 (2年供款, 每年 USD 1,000,000)
+        const dataLegacy60 = [
+            { age: 61, prem: 1000000, w: 0, a: 500000, b: 0, c: 0, d: 0, total: 500000 },
+            { age: 62, prem: 1000000, w: 0, a: 1000000, b: 28000, c: 0, d: 0, total: 1028000 },
+            { age: 63, prem: 0, w: 0, a: 1165000, b: 84224, c: 320000, d: 0, total: 1569224 },
+            { age: 64, prem: 0, w: 0, a: 1230000, b: 140897, c: 380000, d: 0, total: 1750897 },
+            { age: 65, prem: 0, w: 0, a: 1295000, b: 198024, c: 599000, d: 0, total: 2092024 },
+            { age: 66, prem: 0, w: 0, a: 1360000, b: 255609, c: 609000, d: 0, total: 2224609 },
+            { age: 67, prem: 0, w: 0, a: 1425000, b: 313654, c: 647000, d: 0, total: 2385654 },
+            { age: 68, prem: 0, w: 0, a: 1426030, b: 372163, c: 744000, d: 0, total: 2542193 },
+            { age: 69, prem: 0, w: 0, a: 1427050, b: 431140, c: 841000, d: 0, total: 2699190 },
+            { age: 70, prem: 0, w: 0, a: 1454260, b: 490589, c: 1039000, d: 0, total: 2983849 },
+            { age: 71, prem: 0, w: 0, a: 1492760, b: 550514, c: 1139000, d: 0, total: 3182274 },
+            { age: 72, prem: 0, w: 0, a: 1549260, b: 610918, c: 1247000, d: 0, total: 3407178 },
+            { age: 73, prem: 0, w: 0, a: 1625550, b: 671805, c: 1367000, d: 0, total: 3664355 },
+            { age: 74, prem: 0, w: 0, a: 1724180, b: 733180, c: 1596000, d: 0, total: 4053360 },
+            { age: 75, prem: 0, w: 0, a: 1848540, b: 795045, c: 1646000, d: 0, total: 4289585 },
+            { age: 80, prem: 0, w: 0, a: 2015660, b: 1111876, c: 3198000, d: 0, total: 6325536 },
+            { age: 81, prem: 0, w: 0, a: 2023090, b: 1176771, c: 3578000, d: 0, total: 6777861 },
+            { age: 82, prem: 0, w: 0, a: 2031190, b: 1242185, c: 3997000, d: 0, total: 7270375 },
+            { age: 83, prem: 0, w: 1000000, a: 2039980, b: 308123, c: 4459000, d: 0, total: 6807103 },
+            { age: 84, prem: 0, w: 0, a: 2049460, b: 366588, c: 4967000, d: 0, total: 7383048 },
+            { age: 85, prem: 0, w: 0, a: 2059640, b: 425520, c: 5525000, d: 0, total: 8010160 },
+            { age: 86, prem: 0, w: 0, a: 2070530, b: 484925, c: 6141000, d: 0, total: 8696455 },
+            { age: 87, prem: 0, w: 0, a: 2082140, b: 544804, c: 6703785, d: 0, total: 9330730 },
+            { age: 88, prem: 0, w: 0, a: 2094490, b: 605162, c: 7237574, d: 0, total: 9937227 },
+            { age: 89, prem: 0, w: 0, a: 2107580, b: 666004, c: 7809563, d: 0, total: 10583147 },
+            { age: 90, prem: 0, w: 2000000, a: 1876863, b: 0, c: 7394188, d: 0, total: 9271052 },
+            { age: 91, prem: 0, w: 0, a: 1882622, b: 49544, c: 7941503, d: 0, total: 9873670 },
+            { age: 92, prem: 0, w: 0, a: 1888523, b: 99484, c: 8527450, d: 0, total: 10515459 },
+            { age: 93, prem: 0, w: 0, a: 1894584, b: 149824, c: 9154555, d: 0, total: 11198963 },
+            { age: 94, prem: 0, w: 0, a: 1900794, b: 200567, c: 9825534, d: 0, total: 11926896 },
+            { age: 95, prem: 0, w: 5000000, a: 1243733, b: 0, c: 6458411, d: 0, total: 7702144 },
+            { age: 96, prem: 0, w: 0, a: 1247985, b: 32309, c: 6922489, d: 0, total: 8202784 },
+            { age: 100, prem: 0, w: 0, a: 1266021, b: 164154, c: 9122430, d: 0, total: 10552605 },
+            { age: 110, prem: 0, w: 0, a: 1318685, b: 512749, c: 17977256, d: 0, total: 19808691 },
+            { age: 120, prem: 0, w: 0, a: 1364404, b: 890258, c: 34928975, d: 0, total: 37183637 },
+            { age: 130, prem: 0, w: 0, a: 1415089, b: 1299078, c: 67084630, d: 0, total: 69798799 },
+            { age: 138, prem: 0, w: 0, a: 1459504, b: 1650417, c: 112406789, d: 0, total: 115516710 }
+        ];
+
+        function App() {
+          const [currentView, setCurrentView] = useState('home'); // 控制主頁與子頁切換
+          const [activeTab, setActiveTab] = useState('40'); // 預設 40 歲退休方案
+          const [showDetails, setShowDetails] = useState(false);
+          const [currency, setCurrency] = useState('USD');
+          const [exchangeRate, setExchangeRate] = useState(7.8); 
+          const [chartPeriod, setChartPeriod] = useState('active'); 
+
+          useEffect(() => {
+            fetch('https://open.er-api.com/v6/latest/USD')
+              .then(res => res.json())
+              .then(data => {
+                if (data && data.rates && data.rates.HKD) {
+                  setExchangeRate(data.rates.HKD);
+                }
+              })
+              .catch(err => console.log('匯率獲取失敗，使用預設值 7.8'));
+          }, []);
+
+          const formatCurrency = (value) => {
+            const convertedValue = currency === 'HKD' ? value * exchangeRate : value;
+            return new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: currency,
+              maximumFractionDigits: 0,
+            }).format(convertedValue);
+          };
+
+          // 退休方案動態處理
+          const currentRetirementData = activeTab === '30' ? data30 
+                                      : activeTab === '40' ? data40 
+                                      : activeTab === '50' ? data50 
+                                      : data55;
+
+          const processedRetirementData = useMemo(() => {
+            let cumulativePrem = 0;
+            let cumWithdrawal = 0;
+            return currentRetirementData.map(row => {
+              cumulativePrem += row.prem;
+              cumWithdrawal += row.w;
+              return { ...row, cumulativePrem, cumWithdrawal };
+            });
+          }, [currentRetirementData]);
+
+          // 傳承方案動態處理
+          const processedLegacyData = useMemo(() => {
+            let cumulativePrem = 0;
+            let cumWithdrawal = 0;
+            return dataLegacy60.map(row => {
+              cumulativePrem += row.prem;
+              cumWithdrawal += row.w;
+              return { ...row, cumulativePrem, cumWithdrawal };
+            });
+          }, []);
+
+          // 教育儲蓄方案動態處理
+          const processedEducationData = useMemo(() => {
+            let cumulativePrem = 0;
+            let cumWithdrawal = 0;
+            return dataEducation1.map(row => {
+              cumulativePrem += row.prem;
+              cumWithdrawal += row.w;
+              return { ...row, cumulativePrem, cumWithdrawal };
+            });
+          }, []);
+
+          // 主頁視圖
+          const renderHome = () => (
+            <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col min-h-[80vh] justify-center">
+              <div className="text-center mb-12">
+                  <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-4">
+                      <Icon path={icons.ShieldCheck} className="w-12 h-12 text-emerald-600" />
+                      盈聚．天下 II 靈活儲蓄計劃
+                  </h1>
+                  <p className="mt-4 text-xl text-slate-500">請選擇您的理財方案</p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* 主要功能 (頂部大橫幅) */}
+                  <div onClick={() => setCurrentView('features')} className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl p-8 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center sm:col-span-2 group">
+                      <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.Star} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-3xl font-bold text-white mb-2 tracking-wide">盈聚．天下 II 主要功能</h3>
+                      <p className="text-orange-50 text-lg">探索產品四大核心優勢與周全保障</p>
+                  </div>
+
+                  {/* 退休方案 */}
+                  <div onClick={() => setCurrentView('retirement')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+                      <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.Coffee} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">退休方案</h3>
+                      <p className="text-slate-500">規劃理想退休生活，尊享穩健現金流</p>
+                  </div>
+                  {/* 教育儲蓄方案 */}
+                  <div onClick={() => setCurrentView('education')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+                      <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.GraduationCap} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">教育儲蓄方案</h3>
+                      <p className="text-slate-500">為子女準備充裕教育基金，築夢未來</p>
+                  </div>
+                  {/* 傳承方案 */}
+                  <div onClick={() => setCurrentView('legacy')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+                      <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.Diamond} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">傳承方案</h3>
+                      <p className="text-slate-500">守護家族財富，將愛與心意世代相傳</p>
+                  </div>
+                  {/* 特別方案 */}
+                  <div onClick={() => setCurrentView('special')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+                      <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.Target} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">特別方案</h3>
+                      <p className="text-slate-500">度身訂造的靈活理財選項，配合特殊需求</p>
+                  </div>
+              </div>
+            </div>
+          );
+
+          // 盈聚天下主要功能視圖
+          const renderFeatures = () => (
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="mb-2">
+                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-orange-600 transition-colors font-medium">
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                    </button>
+                </div>
+                
+                <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                      <Icon path={icons.Star} className="w-8 h-8 text-orange-500" />
+                      盈聚．天下 II 主要功能
+                    </h1>
+                    <p className="text-slate-500 mt-2 text-lg">
+                      四大核心優勢，全方位規劃您的財富與未來
+                    </p>
+                  </div>
+                </header>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                  {/* 功能 1 */}
+                  <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center">
+                     <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                         <Icon path={icons.TrendingUp} className="w-8 h-8"/>
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">1. 財富增值與優化回報</h3>
+                     <p className="text-slate-500 text-sm">提供保證現金價值與非保證紅利，優化長期潛在回報...</p>
+                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
+                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
+                     </span>
+
+                     {/* Tooltip 向下彈出 */}
+                     <div className="hidden group-hover:block absolute top-[105%] left-1/2 -translate-x-1/2 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-b-[8px] border-b-slate-800"></div>
+                        <ul className="space-y-4 list-disc pl-4">
+                            <li><strong className="text-blue-300">多元紅利結構：</strong> 計劃提供保證現金價值，以及非保證的<span className="text-red-400 font-bold">「歸原紅利」和「特別紅利」</span>，投資策略上強調<span className="text-red-400 font-bold">股權型投資</span>，以實現中長期的財務目標。</li>
+                            <li><strong className="text-blue-300">潛在回報提升：</strong> 優化了長期潛在回報，推前了<span className="text-red-400 font-bold">預期總內部回報率達到6.5%</span>的保單年份，<span className="text-red-400 font-bold">預期總回本期亦相對更快</span>。</li>
+                        </ul>
+                     </div>
+                  </div>
+
+                  {/* 功能 2 */}
+                  <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center">
+                     <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
+                         <Icon path={icons.Diamond} className="w-8 h-8"/>
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">2. 完善的財富傳承與遺產規劃</h3>
+                     <p className="text-slate-500 text-sm">首創保單暫託人服務，提供靈活保單分拆與無限次更改被保人...</p>
+                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
+                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
+                     </span>
+
+                     {/* Tooltip 向下彈出 */}
+                     <div className="hidden group-hover:block absolute top-[105%] left-1/2 -translate-x-1/2 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-b-[8px] border-b-slate-800"></div>
+                        <ul className="space-y-3 list-disc pl-4">
+                            <li><strong className="text-amber-300">全新「保單暫託人服務」：</strong> 允許指定一名<span className="text-red-400 font-bold">保單暫託人</span>，在保單權益人身故後暫時管理保單。確保保單能順利轉移。</li>
+                            <li><strong className="text-amber-300">保單分拆選項：</strong> 保單權益人可將保單<span className="text-red-400 font-bold">分拆成兩份或以上</span>，以實現更靈活的財產分配。</li>
+                            <li><strong className="text-amber-300">富傳家選項：</strong> 可以順位形式<span className="text-red-400 font-bold">指定最多3位後續被保人</span>，保單仍可繼續傳承。</li>
+                            <li><strong className="text-amber-300">身故權益支付選擇：</strong> 提供<span className="text-red-400 font-bold">5個身故賠償的分期支付選項</span>，並可指定支付開始日期。</li>
+                            <li><strong className="text-amber-300">更改被保人及保單權益人：</strong> 提供<span className="text-red-400 font-bold">無限次更改被保人選擇</span>，進一步將財富無限傳承。</li>
+                        </ul>
+                     </div>
+                  </div>
+
+                  {/* 功能 3 */}
+                  <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center mt-4 md:mt-0">
+                     <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                         <Icon path={icons.ArrowRightLeft} className="w-8 h-8"/>
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">3. 靈活理財與資金流動性</h3>
+                     <p className="text-slate-500 text-sm">提供多種保單貨幣選擇，轉換靈活，並配有定期提取服務...</p>
+                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
+                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
+                     </span>
+
+                     {/* Tooltip 向上彈出 (避免被底部裁切) */}
+                     <div className="hidden group-hover:block absolute bottom-[105%] left-1/2 -translate-x-1/2 mb-4 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-t-[8px] border-t-slate-800"></div>
+                        <ul className="space-y-3 list-disc pl-4">
+                            <li><strong className="text-emerald-300">多元保單貨幣：</strong> 提供多達<span className="text-red-400 font-bold">8種保單貨幣選擇</span>（美元、港元、人民幣、澳元、加元、歐元、英鎊、新加坡元）。</li>
+                            <li><strong className="text-emerald-300">保單貨幣轉換選項：</strong> 由第3個保單週年日起，客戶可<span className="text-red-400 font-bold">將原來的保單貨幣轉換至其他貨幣</span>。</li>
+                            <li><strong className="text-emerald-300">靈活提款及定期提取：</strong> 客戶可隨時提取紅利現金價值；供款期後亦可申請<span className="text-red-400 font-bold">定期提取服務</span>。</li>
+                            <li><strong className="text-emerald-300">保費抵繳功能：</strong> 供款期後可提取款項以<span className="text-red-400 font-bold">抵繳指定的醫療及保障產品</span>的未來保費。</li>
+                            <li><strong className="text-emerald-300">靈活供款年期與保費假期：</strong> 提供2年或5年供款期選擇；5年繳保單更可享有<span className="text-red-400 font-bold">長達2年的保費假期</span>。</li>
+                        </ul>
+                     </div>
+                  </div>
+
+                  {/* 功能 4 */}
+                  <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center mt-4 md:mt-0">
+                     <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4">
+                         <Icon path={icons.ShieldCheck} className="w-8 h-8"/>
+                     </div>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">4. 額外保障與人生里程碑獎賞</h3>
+                     <p className="text-slate-500 text-sm">提供意外身故權益、失去行為能力權益，及各項人生里程碑獎賞...</p>
+                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
+                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
+                     </span>
+
+                     {/* Tooltip 向上彈出 (避免被底部裁切) */}
+                     <div className="hidden group-hover:block absolute bottom-[105%] left-1/2 -translate-x-1/2 mb-4 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-t-[8px] border-t-slate-800"></div>
+                        <ul className="space-y-3 list-disc pl-4">
+                            <li><strong className="text-purple-300">護家保意外身故權益：</strong> 於保單生效首10年內，若被保人或直屬家庭成員不幸意外身故，將額外支付<span className="text-red-400 font-bold">相等於繳付保費總額200%的賠償</span>（最高20萬美元）。</li>
+                            <li><strong className="text-purple-300">失去行為能力權益：</strong> 當保單權益人確診指定受保疾病（<span className="text-red-400 font-bold">失去行為能力</span>）時，指定家庭成員可代為提取部分或全部保單價值。</li>
+                            <li><strong className="text-purple-300">初生嬰兒及學業獎賞：</strong> 若有親生嬰兒出生，可獲支付<span className="text-red-400 font-bold">20,000港元「初生嬰兒獎賞」</span>；若子女達成指定學業成就，則可獲<span className="text-red-400 font-bold">高達31,000港元的「傑出表現獎」</span>。</li>
+                        </ul>
+                     </div>
+                  </div>
+                </div>
+            </div>
+          );
+
+          // 正在建設中視圖
+          const renderPlaceholder = (title) => (
+            <div className="max-w-3xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+                <button onClick={() => setCurrentView('home')} className="mb-8 flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
+                    <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                </button>
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-6">{title}</h2>
+                  <div className="bg-white p-16 rounded-3xl shadow-sm border border-slate-200">
+                      <Icon path={icons.Activity} className="w-20 h-20 mx-auto text-slate-300 mb-6" />
+                      <p className="text-2xl font-medium text-slate-600 mb-2">正在建設中</p>
+                      <p className="text-slate-500">此方案的數據與內容即將推出，敬請期待。</p>
+                  </div>
+                </div>
+            </div>
+          );
+
+          // 退休方案的視圖
+          const renderRetirement = () => {
+            const planDetails = {
+              '30': { premAge: '31-35歲', accumAge: '36歲-60歲', accumYears: '25年', withdrawAge: '61歲至95歲', withdrawYears: '35年', withdrawalAmount: 27000 },
+              '40': { premAge: '41-45歲', accumAge: '46歲-65歲', accumYears: '20年', withdrawAge: '66歲至95歲', withdrawYears: '30年', withdrawalAmount: 20000 },
+              '50': { premAge: '51-55歲', accumAge: '56歲-70歲', accumYears: '15年', withdrawAge: '71歲至95歲', withdrawYears: '25年', withdrawalAmount: 16000 },
+              '55': { premAge: '56-60歲', accumAge: '61歲-70歲', accumYears: '10年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 12000 }
+            };
+            const currentDetails = planDetails[activeTab];
+            const headerSubtitle = `${activeTab}歲男士 | 5年供款 | ${currentDetails.withdrawAge.split('至')[0]}起每年提取 $${currentDetails.withdrawalAmount.toLocaleString()}`;
+
+            const totalPremium = processedRetirementData[processedRetirementData.length - 1].cumulativePrem;
+            const totalWithdrawn = processedRetirementData[processedRetirementData.length - 1].cumWithdrawal;
+            const finalValue = processedRetirementData[processedRetirementData.length - 1].total;
+
+            const chartData = chartPeriod === 'active' 
+              ? processedRetirementData.filter(d => d.age <= 95)
+              : chartPeriod === 'legacy' ? processedRetirementData.filter(d => d.age >= 95) : processedRetirementData;
+
+            return (
+              <div className="max-w-7xl mx-auto space-y-6">
+                  <div className="mb-2">
+                      <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                      </button>
+                  </div>
+                  
+                  {/* Header & Tabs */}
+                  <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <Icon path={icons.ShieldCheck} className="w-8 h-8 text-blue-600" />
+                        退休方案分析
+                      </h1>
+                      <p className="text-slate-500 mt-2 text-lg">
+                        {headerSubtitle}
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+                      <div className="flex flex-wrap sm:flex-nowrap bg-slate-200 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
+                        {['30', '40', '50', '55'].map(tab => (
+                          <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-300/50'}`}>
+                            <Icon path={icons.Users} className="w-4 h-4" /> {tab}歲方案
+                          </button>
+                        ))}
+                      </div>
+                      <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
+                        <Icon path={icons.RefreshCw} className={`w-5 h-5 text-blue-500 mr-2 ${currency === 'HKD' ? 'rotate-180' : ''} transition-transform duration-500`} />
+                        <span className="font-medium text-slate-700">
+                          {currency === 'USD' ? 'USD' : 'HKD'}
+                          {currency === 'HKD' && <span className="text-xs ml-1 text-slate-400">({exchangeRate.toFixed(2)})</span>}
+                        </span>
+                      </button>
+                    </div>
+                  </header>
+
+                  {/* Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-500 mb-2">
+                        <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                          <Icon path={icons.PiggyBank} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                      </div>
+                      <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
+                      <div className="mt-3 space-y-1">
+                        <p className="text-sm text-slate-500">首5年 ({currentDetails.premAge})，每年 {formatCurrency(13000)}</p>
+                        <p className="text-sm text-slate-500 bg-slate-50 py-1 px-2 rounded-md inline-block">
+                          {currentDetails.accumAge}為收息期，總「收息年期」為 <span className="text-red-500 font-bold">{currentDetails.accumYears}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-0 opacity-50"></div>
+                      <div className="flex items-center gap-3 text-slate-500 mb-2 z-10">
+                        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                          <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                      </div>
+                      <div className="text-3xl font-bold text-emerald-600 z-10">{formatCurrency(totalWithdrawn)}</div>
+                      <div className="mt-3 space-y-1 z-10">
+                        <p className="text-sm text-slate-500">{currentDetails.withdrawAge}，每年提取 {formatCurrency(currentDetails.withdrawalAmount)}</p>
+                        <p className="text-sm text-slate-500 bg-emerald-50 py-1 px-2 rounded-md inline-block">
+                          總提款年期為 <span className="text-red-500 font-bold">{currentDetails.withdrawYears}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 shadow-md text-white flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-300 mb-2">
+                        <div className="p-2 bg-white/10 rounded-lg text-amber-400">
+                          <Icon path={icons.TrendingUp} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                      </div>
+                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
+                      <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，留給摰愛</p>
+                    </div>
+                  </div>
+
+                  {/* Chart */}
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <h2 className="text-xl font-bold text-slate-900">保單價值預測圖</h2>
+                        <div className="flex bg-slate-100 p-1.5 rounded-lg w-full sm:w-auto">
+                          <button onClick={() => setChartPeriod('all')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'all' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>全期走勢</button>
+                          <button onClick={() => setChartPeriod('active')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'active' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>供款及提取期</button>
+                          <button onClick={() => setChartPeriod('legacy')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'legacy' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>傳承期 (96歲+)</button>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>累計提取</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>預期退保價值</div>
+                      </div>
+                    </div>
+                    <div className="h-80 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={20} />
+                          <YAxis 
+                            tickFormatter={(val) => {
+                              const converted = currency === 'HKD' ? val * exchangeRate : val;
+                              if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                              return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                            }} 
+                            tick={{ fill: '#64748b' }} 
+                            axisLine={false} 
+                            tickLine={false} 
+                            width={80}
+                          />
+                          <RechartsTooltip 
+                            formatter={(value) => formatCurrency(value)}
+                            labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          />
+                          <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                          <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
+                          <Line type="monotone" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                      <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
+                        年度價值明細 ({activeTab}歲方案)
+                      </h2>
+                      <button 
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
+                      >
+                        <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
+                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                      </button>
+                    </div>
+                    
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                      <table className="w-full text-left text-sm whitespace-nowrap relative">
+                        <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
+                          <tr>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">累計提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">預期總退保價值</th>
+                            
+                            {showDetails && (
+                              <React.Fragment>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                              </React.Fragment>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {processedRetirementData.map((row) => (
+                            <tr 
+                              key={row.age} 
+                              className={`hover:bg-slate-100/80 transition-colors ${row.w > 0 ? 'bg-emerald-50/40' : ''}`}
+                            >
+                              <td className="p-4 text-center font-medium text-slate-700">{row.age}</td>
+                              <td className="p-4 text-right text-slate-600">{row.prem > 0 ? formatCurrency(row.prem) : '-'}</td>
+                              <td className="p-4 text-right font-medium text-blue-700 bg-blue-50/10">{formatCurrency(row.cumulativePrem)}</td>
+                              <td className="p-4 text-right font-semibold text-emerald-600">{row.w > 0 ? formatCurrency(row.w) : '-'}</td>
+                              <td className="p-4 text-right font-medium text-emerald-700 bg-emerald-50/10">{formatCurrency(row.cumWithdrawal)}</td>
+                              <td className="p-4 text-right font-bold text-amber-600 bg-amber-50/10">{formatCurrency(row.total)}</td>
+                              
+                              {showDetails && (
+                                <React.Fragment>
+                                  <td className="p-4 text-right text-slate-500 border-l border-slate-200 bg-slate-50/30">{formatCurrency(row.a)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.b)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.c)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.d)}</td>
+                                </React.Fragment>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            );
+          };
+
+          // 教育儲蓄方案的視圖
+          const renderEducation = () => {
+            const totalPremium = processedEducationData[processedEducationData.length - 1].cumulativePrem;
+            const totalWithdrawn = processedEducationData[processedEducationData.length - 1].cumWithdrawal;
+            const finalValue = processedEducationData[processedEducationData.length - 1].total;
+
+            return (
+              <div className="max-w-7xl mx-auto space-y-6">
+                  <div className="mb-2">
+                      <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                      </button>
+                  </div>
+                  
+                  {/* Header */}
+                  <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <Icon path={icons.GraduationCap} className="w-8 h-8 text-emerald-600" />
+                        教育儲蓄方案分析
+                      </h1>
+                      <p className="text-slate-500 mt-2 text-lg">
+                        1歲幼兒 | 5年供款 | 預備大學教育基金
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+                      <div className="flex bg-emerald-100 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
+                          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-all bg-white shadow text-emerald-700 cursor-default">
+                            <Icon path={icons.Users} className="w-4 h-4" /> 1歲方案
+                          </button>
+                      </div>
+                      <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
+                        <Icon path={icons.RefreshCw} className={`w-5 h-5 text-blue-500 mr-2 ${currency === 'HKD' ? 'rotate-180' : ''} transition-transform duration-500`} />
+                        <span className="font-medium text-slate-700">
+                          {currency === 'USD' ? 'USD' : 'HKD'}
+                          {currency === 'HKD' && <span className="text-xs ml-1 text-slate-400">({exchangeRate.toFixed(2)})</span>}
+                        </span>
+                      </button>
+                    </div>
+                  </header>
+
+                  {/* Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-500 mb-2">
+                        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                          <Icon path={icons.PiggyBank} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                      </div>
+                      <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
+                      <div className="mt-3 space-y-1">
+                        <p className="text-sm text-slate-500">首5年 (2-6歲)，每年 {formatCurrency(13000)}</p>
+                        <p className="text-sm text-emerald-700 bg-emerald-50 py-1 px-2 rounded-md inline-block font-medium">
+                          7歲-19歲為滾存期，總「滾存年期」為 <span className="text-red-500 font-bold">13年</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-0 opacity-50"></div>
+                      <div className="flex items-center gap-3 text-slate-500 mb-2 z-10">
+                        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                          <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                      </div>
+                      <div className="text-3xl font-bold text-emerald-600 z-10">{formatCurrency(totalWithdrawn)}</div>
+                      <div className="mt-3 space-y-1 z-10">
+                        <p className="text-sm text-slate-500">20歲至22歲，每年提取 {formatCurrency(50000)}作大學學費</p>
+                        <p className="text-sm text-emerald-700 bg-emerald-50 py-1 px-2 rounded-md inline-block font-medium">
+                          總提款年期為 <span className="text-red-500 font-bold">3年</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 shadow-md text-white flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-300 mb-2">
+                        <div className="p-2 bg-white/10 rounded-lg text-amber-400">
+                          <Icon path={icons.TrendingUp} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                      </div>
+                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
+                    <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，將財富跨代傳承</p>
+                  </div>
+                </div>
+
+                {/* Chart */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <h2 className="text-xl font-bold text-slate-900">保單價值預測圖 (兩段式分析)</h2>
+                    </div>
+                    <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>累計提取</div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>預期退保價值</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* 第一段：1-22歲 學業期 */}
+                    <div className="flex flex-col">
+                      <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">第一段：學業及提取期 (1-22歲)</h3>
+                      <div className="h-72 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart data={processedEducationData.filter(d => d.age <= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                            <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={2} />
+                            <YAxis 
+                              tickFormatter={(val) => {
+                                const converted = currency === 'HKD' ? val * exchangeRate : val;
+                                if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                                return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                              }} 
+                              tick={{ fill: '#64748b' }} 
+                              axisLine={false} 
+                              tickLine={false} 
+                              width={65}
+                            />
+                            <RechartsTooltip 
+                              formatter={(value) => formatCurrency(value)}
+                              labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                            />
+                            <ReferenceArea x1={19} x2={22} fill="#10b981" fillOpacity={0.15} strokeOpacity={0} />
+                            <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                            <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
+                            <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <p className="text-xs text-center text-emerald-600 mt-2 font-medium">↑ 綠色範圍為 19-22歲 大學學費提取期</p>
+                    </div>
+
+                    {/* 第二段：23歲+ 財富滾存期 */}
+                    <div className="flex flex-col">
+                      <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">第二段：財富滾存期 (23歲起)</h3>
+                      <div className="h-72 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart data={processedEducationData.filter(d => d.age >= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                            <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={20} />
+                            <YAxis 
+                              tickFormatter={(val) => {
+                                const converted = currency === 'HKD' ? val * exchangeRate : val;
+                                if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                                return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                              }} 
+                              tick={{ fill: '#64748b' }} 
+                              axisLine={false} 
+                              tickLine={false} 
+                              width={65}
+                            />
+                            <RechartsTooltip 
+                              formatter={(value) => formatCurrency(value)}
+                              labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                            />
+                            <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                            <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
+                            <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <p className="text-xs text-center text-slate-400 mt-2">↑ 23歲起停止提取，預期價值享受複息滾存效應</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                      <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
+                        年度價值明細 (1歲教育儲蓄方案)
+                      </h2>
+                      <button 
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
+                      >
+                        <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
+                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                      </button>
+                    </div>
+                    
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto pb-8">
+                      <table className="w-full text-left text-sm whitespace-nowrap relative">
+                        <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
+                          <tr>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">累計提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">預期總退保價值</th>
+                            
+                            {showDetails && (
+                              <React.Fragment>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                              </React.Fragment>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {processedEducationData.map((row) => (
+                            <tr 
+                              key={row.age} 
+                              className={`hover:bg-slate-100/80 transition-colors ${row.w > 0 ? 'bg-emerald-50/40' : ''}`}
+                            >
+                              <td className="p-4 text-center font-medium text-slate-700">{row.age}</td>
+                              <td className="p-4 text-right text-slate-600">{row.prem > 0 ? formatCurrency(row.prem) : '-'}</td>
+                              <td className="p-4 text-right font-medium text-blue-700 bg-blue-50/10">{formatCurrency(row.cumulativePrem)}</td>
+                              
+                              {/* 帶有 Tooltip 的提取欄位 */}
+                              <td className="p-4 text-right font-semibold text-emerald-600">
+                                {row.w > 0 ? (
+                                  <div className="group relative inline-flex items-center justify-end cursor-help">
+                                    <span className="border-b-2 border-dashed border-emerald-400 pb-0.5 flex items-center gap-1">
+                                      <Icon path={icons.Info} className="w-4 h-4 text-emerald-500" />
+                                      {formatCurrency(row.w)}
+                                    </span>
+                                    {/* 向左側彈出的提示框 */}
+                                    <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all">
+                                        <div>
+                                          {row.age === 20 && <span className="font-bold text-base mt-1 inline-block">大學一年級學費</span>}
+                                          {row.age === 21 && <span className="font-bold text-base mt-1 inline-block">大學二年級學費</span>}
+                                          {row.age === 22 && <span className="font-bold text-base mt-1 inline-block">大學三年級學費</span>}
+                                        </div>
+                                        <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
+                                    </div>
+                                  </div>
+                                ) : '-'}
+                              </td>
+
+                              <td className="p-4 text-right font-medium text-emerald-700 bg-emerald-50/10">{formatCurrency(row.cumWithdrawal)}</td>
+                              
+                              {/* 帶有 Tooltip 的預期總退保價值欄位 (針對 36 歲) */}
+                              <td className="p-4 text-right font-bold text-amber-600 bg-amber-50/10">
+                                {row.age === 36 ? (
+                                  <div className="group relative inline-flex items-center justify-end cursor-help">
+                                    <span className="border-b-2 border-dashed border-amber-400 pb-0.5 flex items-center gap-1">
+                                      <Icon path={icons.Info} className="w-4 h-4 text-amber-500" />
+                                      {formatCurrency(row.total)}
+                                    </span>
+                                    {/* 向左側彈出的提示框 */}
+                                    <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all whitespace-normal leading-relaxed">
+                                        <div>可取消戶口，用作<span className="text-amber-400 font-bold">置業、創業、再進修</span>等等用途</div>
+                                        <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  formatCurrency(row.total)
+                                )}
+                              </td>
+                              
+                              {showDetails && (
+                                <React.Fragment>
+                                  <td className="p-4 text-right text-slate-500 border-l border-slate-200 bg-slate-50/30">{formatCurrency(row.a)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.b)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.c)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.d)}</td>
+                                </React.Fragment>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            );
+          };
+
+          // 傳承方案的視圖
+          const renderLegacy = () => {
+            const totalPremium = processedLegacyData[processedLegacyData.length - 1].cumulativePrem;
+            const totalWithdrawn = processedLegacyData[processedLegacyData.length - 1].cumWithdrawal;
+            const finalValue = processedLegacyData[processedLegacyData.length - 1].total;
+
+            return (
+              <div className="max-w-7xl mx-auto space-y-6">
+                  <div className="mb-2">
+                      <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                      </button>
+                  </div>
+                  
+                  {/* Header */}
+                  <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <Icon path={icons.Diamond} className="w-8 h-8 text-amber-600" />
+                        傳承方案分析
+                      </h1>
+                      <p className="text-slate-500 mt-2 text-lg">
+                        60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+                      <div className="flex bg-amber-100 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
+                          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-all bg-white shadow text-amber-700 cursor-default">
+                            <Icon path={icons.Users} className="w-4 h-4" /> 60歲方案
+                          </button>
+                      </div>
+                      <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
+                        <Icon path={icons.RefreshCw} className={`w-5 h-5 text-blue-500 mr-2 ${currency === 'HKD' ? 'rotate-180' : ''} transition-transform duration-500`} />
+                        <span className="font-medium text-slate-700">
+                          {currency === 'USD' ? 'USD' : 'HKD'}
+                          {currency === 'HKD' && <span className="text-xs ml-1 text-slate-400">({exchangeRate.toFixed(2)})</span>}
+                        </span>
+                      </button>
+                    </div>
+                  </header>
+
+                  {/* Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-500 mb-2">
+                        <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                          <Icon path={icons.PiggyBank} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                      </div>
+                      <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
+                      <div className="mt-3 space-y-1">
+                        <p className="text-sm text-slate-500">首2年 (61-62歲)，每年 {formatCurrency(1000000)}</p>
+                        <p className="text-sm text-amber-700 bg-amber-50 py-1 px-2 rounded-md inline-block font-medium">
+                          極速2年短暫供款期
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-0 opacity-50"></div>
+                      <div className="flex items-center gap-3 text-slate-500 mb-2 z-10">
+                        <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                          <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                      </div>
+                      <div className="text-3xl font-bold text-amber-600 z-10">{formatCurrency(totalWithdrawn)}</div>
+                      <div className="mt-3 space-y-1 z-10">
+                        <p className="text-sm text-slate-500">分別於 83歲, 90歲 及 95歲 大額提取</p>
+                        <p className="text-sm text-amber-700 bg-amber-50 py-1 px-2 rounded-md inline-block font-medium">
+                          傳承家族財富與設立社會基金
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 shadow-md text-white flex flex-col justify-center items-start">
+                      <div className="flex items-center gap-3 text-slate-300 mb-2">
+                        <div className="p-2 bg-white/10 rounded-lg text-amber-400">
+                          <Icon path={icons.TrendingUp} className="w-6 h-6" />
+                        </div>
+                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                      </div>
+                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
+                      <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，留給摰愛</p>
+                    </div>
+                  </div>
+
+                  {/* Chart */}
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <h2 className="text-xl font-bold text-slate-900">保單價值預測圖</h2>
+                      </div>
+                      <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>累計提取</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 rounded-full"></div>預期退保價值</div>
+                      </div>
+                    </div>
+                    <div className="h-80 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={processedLegacyData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={20} />
+                          <YAxis 
+                            tickFormatter={(val) => {
+                              const converted = currency === 'HKD' ? val * exchangeRate : val;
+                              if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                              return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                            }} 
+                            tick={{ fill: '#64748b' }} 
+                            axisLine={false} 
+                            tickLine={false} 
+                            width={80}
+                          />
+                          <RechartsTooltip 
+                            formatter={(value) => formatCurrency(value)}
+                            labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          />
+                          <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#f1f5f9" stroke="#1e293b" strokeWidth={3} />
+                          <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
+                          <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#f59e0b" strokeWidth={3} dot={false} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                      <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                        <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
+                        年度價值明細 (60歲傳承方案)
+                      </h2>
+                      <button 
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
+                      >
+                        <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
+                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                      </button>
+                    </div>
+                    
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto pb-8">
+                      <table className="w-full text-left text-sm whitespace-nowrap relative">
+                        <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
+                          <tr>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">累計提取</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-slate-800 bg-slate-100/90">預期總退保價值</th>
+                            
+                            {showDetails && (
+                              <React.Fragment>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                              </React.Fragment>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {processedLegacyData.map((row) => (
+                            <tr 
+                              key={row.age} 
+                              className={`hover:bg-slate-100/80 transition-colors ${row.w > 0 ? 'bg-amber-50/60' : ''}`}
+                            >
+                              <td className="p-4 text-center font-medium text-slate-700">{row.age}</td>
+                              <td className="p-4 text-right text-slate-600">{row.prem > 0 ? formatCurrency(row.prem) : '-'}</td>
+                              <td className="p-4 text-right font-medium text-blue-700 bg-blue-50/10">{formatCurrency(row.cumulativePrem)}</td>
+                              
+                              {/* 帶有 Tooltip 的提取欄位 */}
+                              <td className="p-4 text-right font-semibold text-amber-600">
+                                {row.w > 0 ? (
+                                  <div className="group relative inline-flex items-center justify-end cursor-help">
+                                    <span className="border-b-2 border-dashed border-amber-400 pb-0.5 flex items-center gap-1">
+                                      <Icon path={icons.Info} className="w-4 h-4 text-amber-500" />
+                                      {formatCurrency(row.w)}
+                                    </span>
+                                    {/* 向左側彈出的提示框 */}
+                                    <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all">
+                                        <div>
+                                          {row.age === 83 && <span>送給孫子的愛，<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">人生第一份創業資金</span></span>}
+                                          {row.age === 90 && <span>送給孫子的愛，<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">結婚安樂窩</span></span>}
+                                          {row.age === 95 && <span>取之於社會用之於社會，設立<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">社會基金 ，回饋社會</span></span>}
+                                        </div>
+                                        <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
+                                    </div>
+                                  </div>
+                                ) : '-'}
+                              </td>
+
+                              <td className="p-4 text-right font-medium text-amber-700 bg-amber-50/10">{formatCurrency(row.cumWithdrawal)}</td>
+                              <td className="p-4 text-right font-bold text-slate-800 bg-slate-100/50">{formatCurrency(row.total)}</td>
+                              
+                              {showDetails && (
+                                <React.Fragment>
+                                  <td className="p-4 text-right text-slate-500 border-l border-slate-200 bg-slate-50/30">{formatCurrency(row.a)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.b)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.c)}</td>
+                                  <td className="p-4 text-right text-slate-500 bg-slate-50/30">{formatCurrency(row.d)}</td>
+                                </React.Fragment>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            );
+          };
+
+          return (
+            <div className="min-h-screen text-slate-800 font-sans bg-slate-50 p-4 sm:p-8">
+              {currentView === 'home' && renderHome()}
+              {currentView === 'features' && renderFeatures()}
+              {currentView === 'retirement' && renderRetirement()}
+              {currentView === 'education' && renderEducation()}
+              {currentView === 'legacy' && renderLegacy()}
+              {currentView === 'special' && renderPlaceholder('特別方案')}
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
