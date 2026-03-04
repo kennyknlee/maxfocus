@@ -576,7 +576,7 @@
               '55': { premAge: '56-60歲', accumAge: '61歲-70歲', accumYears: '10年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 12000 }
             };
             const currentDetails = planDetails[activeTab];
-            const headerSubtitle = `${activeTab}歲男士 | 5年供款 | ${currentDetails.withdrawAge.split('至')[0]}起每年提取 $${currentDetails.withdrawalAmount.toLocaleString()}`;
+            const headerSubtitle = `${activeTab}歲 | 5年供款 | ${currentDetails.withdrawAge.split('至')[0]}起每年提取 $${currentDetails.withdrawalAmount.toLocaleString()}`;
 
             const totalPremium = processedRetirementData[processedRetirementData.length - 1].cumulativePrem;
             const totalWithdrawn = processedRetirementData[processedRetirementData.length - 1].cumWithdrawal;
