@@ -24,6 +24,334 @@
         const { useState, useMemo, useEffect } = React;
         const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceArea } = window.Recharts;
 
+        // --- 語言翻譯字典 ---
+        const translations = {
+            tc: {
+                // 通用
+                home: "返回主頁",
+                lang_tc: "繁",
+                lang_sc: "简",
+                lang_en: "EN",
+                // 首頁
+                main_title: "盈聚．天下 II 靈活儲蓄計劃",
+                sub_title: "請選擇您的理財方案",
+                feat_title: "盈聚．天下 II 主要功能",
+                feat_desc: "探索產品四大核心優勢與周全保障",
+                ret_title: "退休方案",
+                ret_desc: "規劃理想退休生活，尊享穩健現金流",
+                edu_title: "教育儲蓄方案",
+                edu_desc: "為子女準備充裕教育基金，築夢未來",
+                leg_title: "傳承方案",
+                leg_desc: "守護家族財富，將愛與心意世代相傳",
+                anim_title: "傳承方案動畫展示",
+                anim_desc: "更改保單權益人及被保人流程示範",
+                spec_title: "特別方案",
+                spec_desc: "度身訂造的靈活理財選項，配合特殊需求",
+                // 方案共通
+                plan_analysis: "方案分析",
+                cumulative_prem: "累計總供款",
+                est_total_withdraw: "預計總提取資金",
+                est_legacy_value: "預期滾存傳承價值",
+                age_man: "歲",
+                age_kid: "歲幼兒",
+                prem_years: "年供款",
+                withdraw_start: "歲起每年提取",
+                first: "首",
+                years: "年",
+                every_year: "每年",
+                accum_period: "為收息期，總「收息年期」為",
+                withdraw_total_years: "總提款年期為",
+                legacy_desc: "歲時預期退保價值，留給摰愛",
+                legacy_desc_edu: "歲時預期退保價值，將財富跨代傳承",
+                chart_title: "保單價值預測圖",
+                chart_split_title: "保單價值預測圖 (兩段式分析)",
+                chart_all: "全期走勢",
+                chart_active: "供款及提取期",
+                chart_legacy: "傳承期 (96歲+)",
+                chart_study: "學業及提取期 (1-22歲)",
+                chart_accum: "財富滾存期 (23歲起)",
+                chart_label_study: "↑ 綠色範圍為 19-22歲 大學學費提取期",
+                chart_label_accum: "↑ 23歲起停止提取，預期價值享受複息滾存效應",
+                legend_prem: "累計供款",
+                legend_withdraw: "累計提取",
+                legend_value: "預期退保價值",
+                table_title: "年度價值明細",
+                hide_details: "隱藏分項數據",
+                show_details: "顯示分項數據",
+                table_col_age: "年齡",
+                table_col_cur_prem: "當年供款",
+                table_col_cum_prem: "累計供款",
+                table_col_cur_w: "當年提取",
+                table_col_cum_w: "累計提取",
+                table_col_total: "預期總退保價值",
+                table_col_gcv: "(A)保證現金價值",
+                table_col_rb: "(B)歸原紅利",
+                table_col_sb: "(C)特別紅利",
+                table_col_div: "(D)紅利鎖定",
+                tooltip_age: "被保人年齡",
+                // 教育方案專用
+                edu_subtitle: "預備大學教育基金",
+                edu_accum_years: "為滾存期，總「滾存年期」為",
+                edu_withdraw_desc: "歲至22歲，每年提取",
+                edu_tuition: "作大學學費",
+                edu_uni_1: "大學一年級學費",
+                edu_uni_2: "大學二年級學費",
+                edu_uni_3: "大學三年級學費",
+                edu_cancel_account: "可取消戶口，用作",
+                edu_cancel_use: "置業、創業、再進修",
+                edu_cancel_etc: "等等用途",
+                // 傳承方案專用
+                leg_subtitle: "60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案",
+                leg_prem_desc: "極速2年短暫供款期",
+                leg_withdraw_desc: "分別於 83歲, 90歲 及 95歲 大額提取",
+                leg_withdraw_purpose: "傳承家族財富與設立社會基金",
+                leg_tip_1_title: "送給孫子的愛，",
+                leg_tip_1_hl: "人生第一份創業資金",
+                leg_tip_2_title: "送給孫子的愛，",
+                leg_tip_2_hl: "結婚安樂窩",
+                leg_tip_3_title: "取之於社會用之於社會，設立",
+                leg_tip_3_hl: "社會基金 ，回饋社會",
+                // 動畫
+                anim_replay: "重新播放",
+                anim_next: "下一步",
+                anim_rewatch: "重新觀看",
+                anim_main_title: "財富傳承 - 更改被保人及保單權益人",
+                anim_sub_title: "點擊下方按鈕推進時間線，觀看財富傳承的驚人增長",
+                anim_step0_title: "第一代被保人：Jackie",
+                anim_step0_desc: "保單權益人/被保人：Jackie (50歲) \n非吸煙者",
+                anim_step0_policy: "盈聚．天下 II - 2年繳\n名義金額: $1,000,000美元\n年繳保費: $1,000,000美元",
+                anim_step1_title: "第二代被保人：Peter",
+                anim_step1_desc: "第25個保單年度 (Jackie 75歲)\nJackie把被保人及保單權益人轉為兒子Peter (40歲)",
+                anim_step1_label: "總現金價值（非保證）：",
+                anim_step1_pct: "(佔繳付保費總額的451%)",
+                anim_step2_title: "第三代被保人：Susan",
+                anim_step2_desc: "第45個保單年度 (Peter 60歲)\nPeter把被保人及保單權益人轉為女兒Susan (30歲)",
+                anim_step2_pct: "(佔繳付保費總額的1649%)",
+                anim_step3_title: "財富傳承完成",
+                anim_step3_desc: "第80個保單年度 (Susan 65歲)\nSusan可選擇提取現金作為己用或把保單價值留給子女",
+                anim_step3_pct: "(佔繳付保費總額的14945%)",
+                // 建設中
+                uc_title: "正在建設中",
+                uc_desc: "此方案的數據與內容即將推出，敬請期待。"
+            },
+            sc: {
+                // 通用
+                home: "返回主页",
+                lang_tc: "繁",
+                lang_sc: "简",
+                lang_en: "EN",
+                // 首頁
+                main_title: "盈聚．天下 II 灵活储蓄计划",
+                sub_title: "请选择您的理财方案",
+                feat_title: "盈聚．天下 II 主要功能",
+                feat_desc: "探索产品四大核心优势与周全保障",
+                ret_title: "退休方案",
+                ret_desc: "规划理想退休生活，尊享稳健现金流",
+                edu_title: "教育储蓄方案",
+                edu_desc: "为子女准备充裕教育基金，筑梦未来",
+                leg_title: "传承方案",
+                leg_desc: "守护家族财富，将爱与心意世代相传",
+                anim_title: "传承方案动画展示",
+                anim_desc: "更改保单权益人及被保人流程示范",
+                spec_title: "特别方案",
+                spec_desc: "量身定制的灵活理财选项，配合特殊需求",
+                // 方案共通
+                plan_analysis: "方案分析",
+                cumulative_prem: "累计总供款",
+                est_total_withdraw: "预计总提取资金",
+                est_legacy_value: "预期滚存传承价值",
+                age_man: "岁",
+                age_kid: "岁幼儿",
+                prem_years: "年供款",
+                withdraw_start: "岁起每年提取",
+                first: "首",
+                years: "年",
+                every_year: "每年",
+                accum_period: "为收息期，总「收息年期」为",
+                withdraw_total_years: "总提款年期为",
+                legacy_desc: "岁时预期退保价值，留给摰爱",
+                legacy_desc_edu: "岁时预期退保价值，将财富跨代传承",
+                chart_title: "保单价值预测图",
+                chart_split_title: "保单价值预测图 (两段式分析)",
+                chart_all: "全期走势",
+                chart_active: "供款及提取期",
+                chart_legacy: "传承期 (96岁+)",
+                chart_study: "学业及提取期 (1-22岁)",
+                chart_accum: "财富滚存期 (23岁起)",
+                chart_label_study: "↑ 绿色范围为 19-22岁 大学学费提取期",
+                chart_label_accum: "↑ 23岁起停止提取，预期价值享受复息滚存效应",
+                legend_prem: "累计供款",
+                legend_withdraw: "累计提取",
+                legend_value: "预期退保价值",
+                table_title: "年度价值明细",
+                hide_details: "隐藏分项数据",
+                show_details: "显示分项数据",
+                table_col_age: "年龄",
+                table_col_cur_prem: "当年供款",
+                table_col_cum_prem: "累计供款",
+                table_col_cur_w: "当年提取",
+                table_col_cum_w: "累计提取",
+                table_col_total: "预期总退保价值",
+                table_col_gcv: "(A)保证现金价值",
+                table_col_rb: "(B)归原红利",
+                table_col_sb: "(C)特别红利",
+                table_col_div: "(D)红利锁定",
+                tooltip_age: "被保人年龄",
+                // 教育方案专用
+                edu_subtitle: "预备大学教育基金",
+                edu_accum_years: "为滚存期，总「滚存年期」为",
+                edu_withdraw_desc: "岁至22岁，每年提取",
+                edu_tuition: "作大学学费",
+                edu_uni_1: "大学一年级学费",
+                edu_uni_2: "大学二年级学费",
+                edu_uni_3: "大学三年级学费",
+                edu_cancel_account: "可取消户口，用作",
+                edu_cancel_use: "置业、创业、再进修",
+                edu_cancel_etc: "等等用途",
+                // 传承方案专用
+                leg_subtitle: "60岁高净值人士 | 2年供款 | 财富传承与慈善基金方案",
+                leg_prem_desc: "极速2年短暂供款期",
+                leg_withdraw_desc: "分别于 83岁, 90岁 及 95岁 大额提取",
+                leg_withdraw_purpose: "传承家族财富与设立社会基金",
+                leg_tip_1_title: "送给孙子的爱，",
+                leg_tip_1_hl: "人生第一份创业资金",
+                leg_tip_2_title: "送给孙子的爱，",
+                leg_tip_2_hl: "结婚安乐窝",
+                leg_tip_3_title: "取之于社会用之于社会，设立",
+                leg_tip_3_hl: "社会基金 ，回馈社会",
+                // 动画
+                anim_replay: "重新播放",
+                anim_next: "下一步",
+                anim_rewatch: "重新观看",
+                anim_main_title: "财富传承 - 更改被保人及保单权益人",
+                anim_sub_title: "点击下方按钮推进时间线，观看财富传承的惊人增长",
+                anim_step0_title: "第一代被保人：Jackie",
+                anim_step0_desc: "保单权益人/被保人：Jackie (50岁) \n非吸烟者",
+                anim_step0_policy: "盈聚．天下 II - 2年缴\n名义金额: $1,000,000美元\n年缴保费: $1,000,000美元",
+                anim_step1_title: "第二代被保人：Peter",
+                anim_step1_desc: "第25个保单年度 (Jackie 75岁)\nJackie把被保人及保单权益人转为儿子Peter (40岁)",
+                anim_step1_label: "总现金价值（非保证）：",
+                anim_step1_pct: "(占缴付保费总额的451%)",
+                anim_step2_title: "第三代被保人：Susan",
+                anim_step2_desc: "第45个保单年度 (Peter 60岁)\nPeter把被保人及保单权益人转为女儿Susan (30岁)",
+                anim_step2_pct: "(占缴付保费总额的1649%)",
+                anim_step3_title: "财富传承完成",
+                anim_step3_desc: "第80个保单年度 (Susan 65岁)\nSusan可选择提取现金作为己用或把保单价值留给子女",
+                anim_step3_pct: "(占缴付保费总额的14945%)",
+                // 建设中
+                uc_title: "正在建设中",
+                uc_desc: "此方案的数据与内容即将推出，敬请期待。"
+            },
+            en: {
+                // 通用
+                home: "Back to Home",
+                lang_tc: "繁",
+                lang_sc: "简",
+                lang_en: "EN",
+                // 首頁
+                main_title: "Wealth Advance II Savings Plan",
+                sub_title: "Please select your financial plan",
+                feat_title: "Key Features",
+                feat_desc: "Explore the four core advantages and comprehensive protections",
+                ret_title: "Retirement Plan",
+                ret_desc: "Plan for your ideal retirement with steady cash flow",
+                edu_title: "Education Savings Plan",
+                edu_desc: "Prepare ample education funds for your children's future",
+                leg_title: "Legacy Plan",
+                leg_desc: "Safeguard family wealth, passing love and legacy across generations",
+                anim_title: "Legacy Plan Animation",
+                anim_desc: "Demonstration of changing the policyholder and insured",
+                spec_title: "Special Plan",
+                spec_desc: "Tailor-made flexible financial options for special needs",
+                // 方案共通
+                plan_analysis: "Plan Analysis",
+                cumulative_prem: "Cumulative Premium",
+                est_total_withdraw: "Est. Total Withdrawal",
+                est_legacy_value: "Est. Legacy Value",
+                age_man: "-yr-old Male",
+                age_kid: "-yr-old Child",
+                prem_years: "-yr premium",
+                withdraw_start: ", withdraw annually from age ",
+                first: "First ",
+                years: " yrs",
+                every_year: " annually",
+                accum_period: " accumulation period, total: ",
+                withdraw_total_years: "Total withdrawal period: ",
+                legacy_desc: "Est. surrender value at age ",
+                legacy_desc_edu: "Est. surrender value at age ",
+                chart_title: "Projected Policy Value",
+                chart_split_title: "Projected Policy Value (Split View)",
+                chart_all: "Full Term",
+                chart_active: "Premium & Withdrawal",
+                chart_legacy: "Legacy (Age 96+)",
+                chart_study: "Study & Withdraw (Age 1-22)",
+                chart_accum: "Wealth Accumulation (Age 23+)",
+                chart_label_study: "↑ Green area: University tuition withdrawal (Age 19-22)",
+                chart_label_accum: "↑ Stop withdrawal from age 23, enjoy compound interest",
+                legend_prem: "Cum. Premium",
+                legend_withdraw: "Cum. Withdrawal",
+                legend_value: "Est. Surrender Value",
+                table_title: "Annual Value Details",
+                hide_details: "Hide Details",
+                show_details: "Show Details",
+                table_col_age: "Age",
+                table_col_cur_prem: "Annual Prem.",
+                table_col_cum_prem: "Cum. Prem.",
+                table_col_cur_w: "Annual W/D",
+                table_col_cum_w: "Cum. W/D",
+                table_col_total: "Est. Total Surrender Value",
+                table_col_gcv: "(A) Guaranteed Cash Value",
+                table_col_rb: "(B) Reversionary Bonus",
+                table_col_sb: "(C) Special Bonus",
+                table_col_div: "(D) Bonus Lock-in",
+                tooltip_age: "Insured Age",
+                // 教育方案專用
+                edu_subtitle: "Prepare university education fund",
+                edu_accum_years: " accumulation period, total: ",
+                edu_withdraw_desc: "Age  to 22, withdraw annually ",
+                edu_tuition: " for university tuition",
+                edu_uni_1: "Year 1 University Tuition",
+                edu_uni_2: "Year 2 University Tuition",
+                edu_uni_3: "Year 3 University Tuition",
+                edu_cancel_account: "Can cancel account for ",
+                edu_cancel_use: "property, startup, further study",
+                edu_cancel_etc: " etc.",
+                // 傳承方案專用
+                leg_subtitle: "Age 60 HNW Individual | 2-yr Premium | Wealth Legacy & Charity Fund",
+                leg_prem_desc: "Ultra-short 2-year premium payment term",
+                leg_withdraw_desc: "Large withdrawals at age 83, 90, and 95",
+                leg_withdraw_purpose: "Pass on family wealth and establish charity fund",
+                leg_tip_1_title: "Love for grandson, ",
+                leg_tip_1_hl: "first startup capital",
+                leg_tip_2_title: "Love for grandson, ",
+                leg_tip_2_hl: "a cozy home for marriage",
+                leg_tip_3_title: "Give back to society, establish ",
+                leg_tip_3_hl: "charity fund",
+                // 動畫
+                anim_replay: "Replay",
+                anim_next: "Next Step",
+                anim_rewatch: "Rewatch",
+                anim_main_title: "Wealth Legacy - Change of Insured & Policyholder",
+                anim_sub_title: "Click the button below to advance the timeline and witness the growth",
+                anim_step0_title: "1st Gen Insured: Jackie",
+                anim_step0_desc: "Policyholder/Insured: Jackie (Age 50) \nNon-smoker",
+                anim_step0_policy: "Wealth Advance II - 2-yr Pay\nNotional Amt: USD $1,000,000\nAnnual Prem: USD $1,000,000",
+                anim_step1_title: "2nd Gen Insured: Peter",
+                anim_step1_desc: "25th Policy Year (Jackie Age 75)\nJackie changes Insured & Policyholder to son Peter (Age 40)",
+                anim_step1_label: "Total Cash Value (Non-Guaranteed):",
+                anim_step1_pct: "(451% of Total Premium Paid)",
+                anim_step2_title: "3rd Gen Insured: Susan",
+                anim_step2_desc: "45th Policy Year (Peter Age 60)\nPeter changes Insured & Policyholder to daughter Susan (Age 30)",
+                anim_step2_pct: "(1649% of Total Premium Paid)",
+                anim_step3_title: "Legacy Completed",
+                anim_step3_desc: "80th Policy Year (Susan Age 65)\nSusan can withdraw cash or leave policy value to her children",
+                anim_step3_pct: "(14945% of Total Premium Paid)",
+                // 建設中
+                uc_title: "Under Construction",
+                uc_desc: "Data and content for this plan are coming soon. Stay tuned."
+            }
+        };
+
         // SVG 圖標組件
         const Icon = ({ path, className = "w-6 h-6", color = "currentColor" }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -48,7 +376,12 @@
             Diamond: '<path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/>',
             Star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
             Info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-            Target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'
+            Target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+            PlayCircle: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+            ChevronRight: '<path d="m9 18 6-6-6-6"/>',
+            RotateCcw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+            User: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+            Globe: '<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
         };
 
         // 1歲教育儲蓄方案數據 (5年供款, 每年 USD 13,000)
@@ -312,12 +645,17 @@
         ];
 
         function App() {
-          const [currentView, setCurrentView] = useState('home'); // 控制主頁與子頁切換
-          const [activeTab, setActiveTab] = useState('40'); // 預設 40 歲退休方案
+          const [language, setLanguage] = useState('tc'); // 'tc', 'sc', 'en'
+          const [currentView, setCurrentView] = useState('home');
+          const [activeTab, setActiveTab] = useState('40');
           const [showDetails, setShowDetails] = useState(false);
           const [currency, setCurrency] = useState('USD');
           const [exchangeRate, setExchangeRate] = useState(7.8); 
           const [chartPeriod, setChartPeriod] = useState('active'); 
+          const [animationStep, setAnimationStep] = useState(0);
+
+          // 取得當前語言字典
+          const t = translations[language];
 
           useEffect(() => {
             fetch('https://open.er-api.com/v6/latest/USD')
@@ -339,7 +677,7 @@
             }).format(convertedValue);
           };
 
-          // 退休方案動態處理
+          // --- 數據處理 ---
           const currentRetirementData = activeTab === '30' ? data30 
                                       : activeTab === '40' ? data40 
                                       : activeTab === '50' ? data50 
@@ -355,7 +693,6 @@
             });
           }, [currentRetirementData]);
 
-          // 傳承方案動態處理
           const processedLegacyData = useMemo(() => {
             let cumulativePrem = 0;
             let cumWithdrawal = 0;
@@ -366,7 +703,6 @@
             });
           }, []);
 
-          // 教育儲蓄方案動態處理
           const processedEducationData = useMemo(() => {
             let cumulativePrem = 0;
             let cumWithdrawal = 0;
@@ -377,69 +713,83 @@
             });
           }, []);
 
-          // 主頁視圖
+          // --- 頂部導航欄 (語言切換) ---
+          const TopNav = () => (
+            <div className="flex justify-end p-4 gap-2">
+                <button onClick={() => setLanguage('tc')} className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${language === 'tc' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>{t.lang_tc}</button>
+                <button onClick={() => setLanguage('sc')} className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${language === 'sc' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>{t.lang_sc}</button>
+                <button onClick={() => setLanguage('en')} className={`px-3 py-1 text-sm font-medium rounded-full transition-colors ${language === 'en' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>{t.lang_en}</button>
+            </div>
+          );
+
+          // --- 視圖組件 ---
           const renderHome = () => (
-            <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col min-h-[80vh] justify-center">
+            <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
               <div className="text-center mb-12">
                   <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-4">
                       <Icon path={icons.ShieldCheck} className="w-12 h-12 text-emerald-600" />
-                      盈聚．天下 II 靈活儲蓄計劃
+                      {t.main_title}
                   </h1>
-                  <p className="mt-4 text-xl text-slate-500">請選擇您的理財方案</p>
+                  <p className="mt-4 text-xl text-slate-500">{t.sub_title}</p>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {/* 主要功能 (頂部大橫幅) */}
                   <div onClick={() => setCurrentView('features')} className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl p-8 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center sm:col-span-2 group">
                       <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
                           <Icon path={icons.Star} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-3xl font-bold text-white mb-2 tracking-wide">盈聚．天下 II 主要功能</h3>
-                      <p className="text-orange-50 text-lg">探索產品四大核心優勢與周全保障</p>
+                      <h3 className="text-3xl font-bold text-white mb-2 tracking-wide">{t.feat_title}</h3>
+                      <p className="text-orange-50 text-lg">{t.feat_desc}</p>
                   </div>
 
-                  {/* 退休方案 */}
                   <div onClick={() => setCurrentView('retirement')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
                       <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform">
                           <Icon path={icons.Coffee} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">退休方案</h3>
-                      <p className="text-slate-500">規劃理想退休生活，尊享穩健現金流</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.ret_title}</h3>
+                      <p className="text-slate-500">{t.ret_desc}</p>
                   </div>
-                  {/* 教育儲蓄方案 */}
+                  
                   <div onClick={() => setCurrentView('education')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
                       <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
                           <Icon path={icons.GraduationCap} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">教育儲蓄方案</h3>
-                      <p className="text-slate-500">為子女準備充裕教育基金，築夢未來</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.edu_title}</h3>
+                      <p className="text-slate-500">{t.edu_desc}</p>
                   </div>
-                  {/* 傳承方案 */}
+                  
                   <div onClick={() => setCurrentView('legacy')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
                       <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-6 group-hover:scale-110 transition-transform">
                           <Icon path={icons.Diamond} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">傳承方案</h3>
-                      <p className="text-slate-500">守護家族財富，將愛與心意世代相傳</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.leg_title}</h3>
+                      <p className="text-slate-500">{t.leg_desc}</p>
                   </div>
-                  {/* 特別方案 */}
-                  <div onClick={() => setCurrentView('special')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+
+                  <div onClick={() => { setCurrentView('legacyAnimation'); setAnimationStep(0); }} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
+                      <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.PlayCircle} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.anim_title}</h3>
+                      <p className="text-slate-500">{t.anim_desc}</p>
+                  </div>
+                  
+                  <div onClick={() => setCurrentView('special')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
                       <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
                           <Icon path={icons.Target} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">特別方案</h3>
-                      <p className="text-slate-500">度身訂造的靈活理財選項，配合特殊需求</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.spec_title}</h3>
+                      <p className="text-slate-500">{t.spec_desc}</p>
                   </div>
               </div>
             </div>
           );
 
-          // 盈聚天下主要功能視圖
           const renderFeatures = () => (
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="mb-2">
                     <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-orange-600 transition-colors font-medium">
-                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                     </button>
                 </div>
                 
@@ -447,11 +797,9 @@
                   <div>
                     <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                       <Icon path={icons.Star} className="w-8 h-8 text-orange-500" />
-                      盈聚．天下 II 主要功能
+                      {t.feat_title}
                     </h1>
-                    <p className="text-slate-500 mt-2 text-lg">
-                      四大核心優勢，全方位規劃您的財富與未來
-                    </p>
+                    <p className="text-slate-500 mt-2 text-lg">{t.feat_desc}</p>
                   </div>
                 </header>
 
@@ -461,18 +809,28 @@
                      <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.TrendingUp} className="w-8 h-8"/>
                      </div>
-                     <h3 className="text-xl font-bold text-slate-800 mb-2">1. 財富增值與優化回報</h3>
-                     <p className="text-slate-500 text-sm">提供保證現金價值與非保證紅利，優化長期潛在回報...</p>
-                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
-                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
-                     </span>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">{language === 'en' ? '1. Wealth Growth & Optimized Returns' : (language === 'sc' ? '1. 财富增值与优化回报' : '1. 財富增值與優化回報')}</h3>
+                     <p className="text-slate-500 text-sm">{language === 'en' ? 'Provides guaranteed cash value and non-guaranteed bonuses to optimize long-term potential returns...' : (language === 'sc' ? '提供保证现金价值与非保证红利，优化长期潜在回报...' : '提供保證現金價值與非保證紅利，優化長期潛在回報...')}</p>
 
-                     {/* Tooltip 向下彈出 */}
                      <div className="hidden group-hover:block absolute top-[105%] left-1/2 -translate-x-1/2 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-b-[8px] border-b-slate-800"></div>
                         <ul className="space-y-4 list-disc pl-4">
-                            <li><strong className="text-blue-300">多元紅利結構：</strong> 計劃提供保證現金價值，以及非保證的<span className="text-red-400 font-bold">「歸原紅利」和「特別紅利」</span>，投資策略上強調<span className="text-red-400 font-bold">股權型投資</span>，以實現中長期的財務目標。</li>
-                            <li><strong className="text-blue-300">潛在回報提升：</strong> 優化了長期潛在回報，推前了<span className="text-red-400 font-bold">預期總內部回報率達到6.5%</span>的保單年份，<span className="text-red-400 font-bold">預期總回本期亦相對更快</span>。</li>
+                            {language === 'en' ? (
+                                <>
+                                  <li><strong className="text-blue-300">Diverse Bonus Structure:</strong> Offers guaranteed cash value, along with non-guaranteed <span className="text-red-400 font-bold">Reversionary and Special Bonuses</span>. The investment strategy emphasizes <span className="text-red-400 font-bold">equity investments</span> to achieve medium to long-term goals.</li>
+                                  <li><strong className="text-blue-300">Enhanced Potential Returns:</strong> Optimizes long-term returns, advancing the policy year where the <span className="text-red-400 font-bold">projected total IRR reaches 6.5%</span>, making the <span className="text-red-400 font-bold">projected payback period faster</span>.</li>
+                                </>
+                            ) : language === 'sc' ? (
+                                <>
+                                  <li><strong className="text-blue-300">多元红利结构：</strong> 计划提供保证现金价值，以及非保证的<span className="text-red-400 font-bold">「归原红利」和「特别红利」</span>，投资策略上强调<span className="text-red-400 font-bold">股权型投资</span>，以实现中长期的财务目标。</li>
+                                  <li><strong className="text-blue-300">潜在回报提升：</strong> 优化了长期潜在回报，推前了<span className="text-red-400 font-bold">预期总内部回报率达到6.5%</span>的保单年份，<span className="text-red-400 font-bold">预期总回本期亦相对更快</span>。</li>
+                                </>
+                            ) : (
+                                <>
+                                  <li><strong className="text-blue-300">多元紅利結構：</strong> 計劃提供保證現金價值，以及非保證的<span className="text-red-400 font-bold">「歸原紅利」和「特別紅利」</span>，投資策略上強調<span className="text-red-400 font-bold">股權型投資</span>，以實現中長期的財務目標。</li>
+                                  <li><strong className="text-blue-300">潛在回報提升：</strong> 優化了長期潛在回報，推前了<span className="text-red-400 font-bold">預期總內部回報率達到6.5%</span>的保單年份，<span className="text-red-400 font-bold">預期總回本期亦相對更快</span>。</li>
+                                </>
+                            )}
                         </ul>
                      </div>
                   </div>
@@ -482,21 +840,37 @@
                      <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.Diamond} className="w-8 h-8"/>
                      </div>
-                     <h3 className="text-xl font-bold text-slate-800 mb-2">2. 完善的財富傳承與遺產規劃</h3>
-                     <p className="text-slate-500 text-sm">首創保單暫託人服務，提供靈活保單分拆與無限次更改被保人...</p>
-                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
-                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
-                     </span>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">{language === 'en' ? '2. Comprehensive Wealth Legacy & Estate Planning' : (language === 'sc' ? '2. 完善的财富传承与遗产规划' : '2. 完善的財富傳承與遺產規劃')}</h3>
+                     <p className="text-slate-500 text-sm">{language === 'en' ? 'First-in-market Policy Custodian service, flexible policy split, and unlimited changes of Insured...' : (language === 'sc' ? '首创保单暂托人服务，提供灵活保单分拆与无限次更改被保人...' : '首創保單暫託人服務，提供靈活保單分拆與無限次更改被保人...')}</p>
 
-                     {/* Tooltip 向下彈出 */}
                      <div className="hidden group-hover:block absolute top-[105%] left-1/2 -translate-x-1/2 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-b-[8px] border-b-slate-800"></div>
                         <ul className="space-y-3 list-disc pl-4">
-                            <li><strong className="text-amber-300">全新「保單暫託人服務」：</strong> 允許指定一名<span className="text-red-400 font-bold">保單暫託人</span>，在保單權益人身故後暫時管理保單。確保保單能順利轉移。</li>
-                            <li><strong className="text-amber-300">保單分拆選項：</strong> 保單權益人可將保單<span className="text-red-400 font-bold">分拆成兩份或以上</span>，以實現更靈活的財產分配。</li>
-                            <li><strong className="text-amber-300">富傳家選項：</strong> 可以順位形式<span className="text-red-400 font-bold">指定最多3位後續被保人</span>，保單仍可繼續傳承。</li>
-                            <li><strong className="text-amber-300">身故權益支付選擇：</strong> 提供<span className="text-red-400 font-bold">5個身故賠償的分期支付選項</span>，並可指定支付開始日期。</li>
-                            <li><strong className="text-amber-300">更改被保人及保單權益人：</strong> 提供<span className="text-red-400 font-bold">無限次更改被保人選擇</span>，進一步將財富無限傳承。</li>
+                            {language === 'en' ? (
+                                <>
+                                  <li><strong className="text-amber-300">New Policy Custodian Service:</strong> Appoint a <span className="text-red-400 font-bold">Policy Custodian</span> to manage the policy after the policyholder's passing, ensuring smooth transfer.</li>
+                                  <li><strong className="text-amber-300">Policy Split Option:</strong> <span className="text-red-400 font-bold">Split the policy into two or more</span> for flexible wealth distribution.</li>
+                                  <li><strong className="text-amber-300">Legacy Option:</strong> <span className="text-red-400 font-bold">Nominate up to 3 contingent insureds</span> so the policy continues across generations.</li>
+                                  <li><strong className="text-amber-300">Death Benefit Settlement Options:</strong> Offers <span className="text-red-400 font-bold">5 installment options</span> with customizable start dates.</li>
+                                  <li><strong className="text-amber-300">Change of Insured:</strong> <span className="text-red-400 font-bold">Unlimited changes of Insured</span> for infinite wealth legacy.</li>
+                                </>
+                            ) : language === 'sc' ? (
+                                <>
+                                  <li><strong className="text-amber-300">全新「保单暂托人服务」：</strong> 允许指定一名<span className="text-red-400 font-bold">保单暂托人</span>，在保单权益人身故后暂时管理保单。确保保单能顺利转移。</li>
+                                  <li><strong className="text-amber-300">保单分拆选项：</strong> 保单权益人可将保单<span className="text-red-400 font-bold">分拆成两份或以上</span>，以实现更灵活的财产分配。</li>
+                                  <li><strong className="text-amber-300">富传家选项：</strong> 可以顺位形式<span className="text-red-400 font-bold">指定最多3位后续被保人</span>，保单仍可继续传承。</li>
+                                  <li><strong className="text-amber-300">身故权益支付选择：</strong> 提供<span className="text-red-400 font-bold">5个身故赔偿的分期支付选项</span>，并可指定支付开始日期。</li>
+                                  <li><strong className="text-amber-300">更改被保人及保单权益人：</strong> 提供<span className="text-red-400 font-bold">无限次更改被保人选择</span>，进一步将财富无限传承。</li>
+                                </>
+                            ) : (
+                                <>
+                                  <li><strong className="text-amber-300">全新「保單暫託人服務」：</strong> 允許指定一名<span className="text-red-400 font-bold">保單暫託人</span>，在保單權益人身故後暫時管理保單。確保保單能順利轉移。</li>
+                                  <li><strong className="text-amber-300">保單分拆選項：</strong> 保單權益人可將保單<span className="text-red-400 font-bold">分拆成兩份或以上</span>，以實現更靈活的財產分配。</li>
+                                  <li><strong className="text-amber-300">富傳家選項：</strong> 可以順位形式<span className="text-red-400 font-bold">指定最多3位後續被保人</span>，保單仍可繼續傳承。</li>
+                                  <li><strong className="text-amber-300">身故權益支付選擇：</strong> 提供<span className="text-red-400 font-bold">5個身故賠償的分期支付選項</span>，並可指定支付開始日期。</li>
+                                  <li><strong className="text-amber-300">更改被保人及保單權益人：</strong> 提供<span className="text-red-400 font-bold">無限次更改被保人選擇</span>，進一步將財富無限傳承。</li>
+                                </>
+                            )}
                         </ul>
                      </div>
                   </div>
@@ -506,21 +880,37 @@
                      <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.ArrowRightLeft} className="w-8 h-8"/>
                      </div>
-                     <h3 className="text-xl font-bold text-slate-800 mb-2">3. 靈活理財與資金流動性</h3>
-                     <p className="text-slate-500 text-sm">提供多種保單貨幣選擇，轉換靈活，並配有定期提取服務...</p>
-                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
-                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
-                     </span>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">{language === 'en' ? '3. Financial Flexibility & Liquidity' : (language === 'sc' ? '3. 灵活理财与资金流动性' : '3. 靈活理財與資金流動性')}</h3>
+                     <p className="text-slate-500 text-sm">{language === 'en' ? 'Multiple currency options, flexible currency conversion, and regular withdrawal services...' : (language === 'sc' ? '提供多种保单货币选择，转换灵活，并配有定期提取服务...' : '提供多種保單貨幣選擇，轉換靈活，並配有定期提取服務...')}</p>
 
-                     {/* Tooltip 向上彈出 (避免被底部裁切) */}
                      <div className="hidden group-hover:block absolute bottom-[105%] left-1/2 -translate-x-1/2 mb-4 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-t-[8px] border-t-slate-800"></div>
                         <ul className="space-y-3 list-disc pl-4">
-                            <li><strong className="text-emerald-300">多元保單貨幣：</strong> 提供多達<span className="text-red-400 font-bold">8種保單貨幣選擇</span>（美元、港元、人民幣、澳元、加元、歐元、英鎊、新加坡元）。</li>
-                            <li><strong className="text-emerald-300">保單貨幣轉換選項：</strong> 由第3個保單週年日起，客戶可<span className="text-red-400 font-bold">將原來的保單貨幣轉換至其他貨幣</span>。</li>
-                            <li><strong className="text-emerald-300">靈活提款及定期提取：</strong> 客戶可隨時提取紅利現金價值；供款期後亦可申請<span className="text-red-400 font-bold">定期提取服務</span>。</li>
-                            <li><strong className="text-emerald-300">保費抵繳功能：</strong> 供款期後可提取款項以<span className="text-red-400 font-bold">抵繳指定的醫療及保障產品</span>的未來保費。</li>
-                            <li><strong className="text-emerald-300">靈活供款年期與保費假期：</strong> 提供2年或5年供款期選擇；5年繳保單更可享有<span className="text-red-400 font-bold">長達2年的保費假期</span>。</li>
+                            {language === 'en' ? (
+                                <>
+                                  <li><strong className="text-emerald-300">Multiple Policy Currencies:</strong> Choose from <span className="text-red-400 font-bold">8 currency options</span> (USD, HKD, RMB, AUD, CAD, EUR, GBP, SGD).</li>
+                                  <li><strong className="text-emerald-300">Currency Conversion Option:</strong> <span className="text-red-400 font-bold">Convert your policy currency</span> to meet global lifestyle needs.</li>
+                                  <li><strong className="text-emerald-300">Flexible & Regular Withdrawals:</strong> Withdraw bonus cash values anytime, or set up a <span className="text-red-400 font-bold">regular withdrawal service</span>.</li>
+                                  <li><strong className="text-emerald-300">Premium Offset:</strong> Extract values to <span className="text-red-400 font-bold">offset premiums for designated health products</span>.</li>
+                                  <li><strong className="text-emerald-300">Flexible Premium Terms & Holiday:</strong> Choose 2 or 5-year pay; 5-yr plans enjoy up to a <span className="text-red-400 font-bold">2-year premium holiday</span>.</li>
+                                </>
+                            ) : language === 'sc' ? (
+                                <>
+                                  <li><strong className="text-emerald-300">多元保单货币：</strong> 提供多达<span className="text-red-400 font-bold">8种保单货币选择</span>（美元、港元、人民币、澳元、加元、欧元、英镑、新加坡元）。</li>
+                                  <li><strong className="text-emerald-300">保单货币转换选项：</strong> 由第3个保单周年日起，客户可<span className="text-red-400 font-bold">将原来的保单货币转换至其他货币</span>。</li>
+                                  <li><strong className="text-emerald-300">灵活提款及定期提取：</strong> 客户可随时提取红利现金价值；供款期后亦可申请<span className="text-red-400 font-bold">定期提取服务</span>。</li>
+                                  <li><strong className="text-emerald-300">保费抵缴功能：</strong> 供款期后可提取款项以<span className="text-red-400 font-bold">抵缴指定的医疗及保障产品</span>的未来保费。</li>
+                                  <li><strong className="text-emerald-300">灵活供款年期与保费假期：</strong> 提供2年或5年供款期选择；5年缴保单更可享有<span className="text-red-400 font-bold">长达2年的保费假期</span>。</li>
+                                </>
+                            ) : (
+                                <>
+                                  <li><strong className="text-emerald-300">多元保單貨幣：</strong> 提供多達<span className="text-red-400 font-bold">8種保單貨幣選擇</span>（美元、港元、人民幣、澳元、加元、歐元、英鎊、新加坡元）。</li>
+                                  <li><strong className="text-emerald-300">保單貨幣轉換選項：</strong> 由第3個保單週年日起，客戶可<span className="text-red-400 font-bold">將原來的保單貨幣轉換至其他貨幣</span>。</li>
+                                  <li><strong className="text-emerald-300">靈活提款及定期提取：</strong> 客戶可隨時提取紅利現金價值；供款期後亦可申請<span className="text-red-400 font-bold">定期提取服務</span>。</li>
+                                  <li><strong className="text-emerald-300">保費抵繳功能：</strong> 供款期後可提取款項以<span className="text-red-400 font-bold">抵繳指定的醫療及保障產品</span>的未來保費。</li>
+                                  <li><strong className="text-emerald-300">靈活供款年期與保費假期：</strong> 提供2年或5年供款期選擇；5年繳保單更可享有<span className="text-red-400 font-bold">長達2年的保費假期</span>。</li>
+                                </>
+                            )}
                         </ul>
                      </div>
                   </div>
@@ -530,19 +920,31 @@
                      <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.ShieldCheck} className="w-8 h-8"/>
                      </div>
-                     <h3 className="text-xl font-bold text-slate-800 mb-2">4. 額外保障與人生里程碑獎賞</h3>
-                     <p className="text-slate-500 text-sm">提供意外身故權益、失去行為能力權益，及各項人生里程碑獎賞...</p>
-                     <span className="mt-4 text-orange-500 text-sm font-medium flex items-center gap-1">
-                        <Icon path={icons.Info} className="w-4 h-4"/> 懸停查看詳情
-                     </span>
+                     <h3 className="text-xl font-bold text-slate-800 mb-2">{language === 'en' ? '4. Extra Protection & Milestone Awards' : (language === 'sc' ? '4. 额外保障与人生里程碑奖赏' : '4. 額外保障與人生里程碑獎賞')}</h3>
+                     <p className="text-slate-500 text-sm">{language === 'en' ? 'Accidental death benefits, incapacity benefits, and awards for life milestones...' : (language === 'sc' ? '提供意外身故权益、失去行为能力权益，及各项人生里程碑奖赏...' : '提供意外身故權益、失去行為能力權益，及各項人生里程碑獎賞...')}</p>
 
-                     {/* Tooltip 向上彈出 (避免被底部裁切) */}
                      <div className="hidden group-hover:block absolute bottom-[105%] left-1/2 -translate-x-1/2 mb-4 w-max max-w-[320px] sm:max-w-[450px] bg-slate-800 text-white text-sm rounded-2xl shadow-2xl p-6 z-[100] text-left">
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[8px] border-x-transparent border-t-[8px] border-t-slate-800"></div>
                         <ul className="space-y-3 list-disc pl-4">
-                            <li><strong className="text-purple-300">護家保意外身故權益：</strong> 於保單生效首10年內，若被保人或直屬家庭成員不幸意外身故，將額外支付<span className="text-red-400 font-bold">相等於繳付保費總額200%的賠償</span>（最高20萬美元）。</li>
-                            <li><strong className="text-purple-300">失去行為能力權益：</strong> 當保單權益人確診指定受保疾病（<span className="text-red-400 font-bold">失去行為能力</span>）時，指定家庭成員可代為提取部分或全部保單價值。</li>
-                            <li><strong className="text-purple-300">初生嬰兒及學業獎賞：</strong> 若有親生嬰兒出生，可獲支付<span className="text-red-400 font-bold">20,000港元「初生嬰兒獎賞」</span>；若子女達成指定學業成就，則可獲<span className="text-red-400 font-bold">高達31,000港元的「傑出表現獎」</span>。</li>
+                            {language === 'en' ? (
+                                <>
+                                  <li><strong className="text-purple-300">Family Accidental Death Benefit:</strong> Within the first 10 years, pays <span className="text-red-400 font-bold">200% of total premium paid</span> for accidental death of the insured or family members (cap USD 200K).</li>
+                                  <li><strong className="text-purple-300">Incapacity Benefit:</strong> Nominate a family member to withdraw policy value if the policyholder is diagnosed with <span className="text-red-400 font-bold">incapacity</span>.</li>
+                                  <li><strong className="text-purple-300">Newborn & Academic Awards:</strong> Enjoy <span className="text-red-400 font-bold">HKD 20,000 Newborn Reward</span> and up to <span className="text-red-400 font-bold">HKD 31,000 Outstanding Performance Award</span> for children's academic achievements.</li>
+                                </>
+                            ) : language === 'sc' ? (
+                                <>
+                                  <li><strong className="text-purple-300">护家保意外身故权益：</strong> 于保单生效首10年内，若被保人或直属家庭成员不幸意外身故，将额外支付<span className="text-red-400 font-bold">相等于缴付保费总额200%的赔偿</span>（最高20万美元）。</li>
+                                  <li><strong className="text-purple-300">失去行为能力权益：</strong> 当保单权益人确诊指定受保疾病（<span className="text-red-400 font-bold">失去行为能力</span>）时，指定家庭成员可代为提取部分或全部保单价值。</li>
+                                  <li><strong className="text-purple-300">初生婴儿及学业奖赏：</strong> 若有亲生婴儿出生，可获支付<span className="text-red-400 font-bold">20,000港元「初生婴儿奖赏」</span>；若子女达成指定学业成就，则可获<span className="text-red-400 font-bold">高达31,000港元的「杰出表现奖」</span>。</li>
+                                </>
+                            ) : (
+                                <>
+                                  <li><strong className="text-purple-300">護家保意外身故權益：</strong> 於保單生效首10年內，若被保人或直屬家庭成員不幸意外身故，將額外支付<span className="text-red-400 font-bold">相等於繳付保費總額200%的賠償</span>（最高20萬美元）。</li>
+                                  <li><strong className="text-purple-300">失去行為能力權益：</strong> 當保單權益人確診指定受保疾病（<span className="text-red-400 font-bold">失去行為能力</span>）時，指定家庭成員可代為提取部分或全部保單價值。</li>
+                                  <li><strong className="text-purple-300">初生嬰兒及學業獎賞：</strong> 若有親生嬰兒出生，可獲支付<span className="text-red-400 font-bold">20,000港元「初生嬰兒獎賞」</span>；若子女達成指定學業成就，則可獲<span className="text-red-400 font-bold">高達31,000港元的「傑出表現獎」</span>。</li>
+                                </>
+                            )}
                         </ul>
                      </div>
                   </div>
@@ -550,24 +952,22 @@
             </div>
           );
 
-          // 正在建設中視圖
           const renderPlaceholder = (title) => (
             <div className="max-w-3xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
                 <button onClick={() => setCurrentView('home')} className="mb-8 flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
-                    <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                    <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                 </button>
                 <div className="text-center">
                   <h2 className="text-3xl font-bold text-slate-900 mb-6">{title}</h2>
                   <div className="bg-white p-16 rounded-3xl shadow-sm border border-slate-200">
                       <Icon path={icons.Activity} className="w-20 h-20 mx-auto text-slate-300 mb-6" />
-                      <p className="text-2xl font-medium text-slate-600 mb-2">正在建設中</p>
-                      <p className="text-slate-500">此方案的數據與內容即將推出，敬請期待。</p>
+                      <p className="text-2xl font-medium text-slate-600 mb-2">{t.uc_title}</p>
+                      <p className="text-slate-500">{t.uc_desc}</p>
                   </div>
                 </div>
             </div>
           );
 
-          // 退休方案的視圖
           const renderRetirement = () => {
             const planDetails = {
               '30': { premAge: '31-35歲', accumAge: '36歲-60歲', accumYears: '25年', withdrawAge: '61歲至95歲', withdrawYears: '35年', withdrawalAmount: 27000 },
@@ -576,7 +976,7 @@
               '55': { premAge: '56-60歲', accumAge: '61歲-70歲', accumYears: '10年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 12000 }
             };
             const currentDetails = planDetails[activeTab];
-            const headerSubtitle = `${activeTab}歲 | 5年供款 | ${currentDetails.withdrawAge.split('至')[0]}起每年提取 $${currentDetails.withdrawalAmount.toLocaleString()}`;
+            const headerSubtitle = `${activeTab}${t.age_man} | 5${t.prem_years} | ${parseInt(currentDetails.withdrawAge)}${t.withdraw_start} $${currentDetails.withdrawalAmount.toLocaleString()}`;
 
             const totalPremium = processedRetirementData[processedRetirementData.length - 1].cumulativePrem;
             const totalWithdrawn = processedRetirementData[processedRetirementData.length - 1].cumWithdrawal;
@@ -590,16 +990,15 @@
               <div className="max-w-7xl mx-auto space-y-6">
                   <div className="mb-2">
                       <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
-                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                       </button>
                   </div>
                   
-                  {/* Header & Tabs */}
                   <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
                     <div>
                       <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                         <Icon path={icons.ShieldCheck} className="w-8 h-8 text-blue-600" />
-                        退休方案分析
+                        {t.ret_title}{t.plan_analysis}
                       </h1>
                       <p className="text-slate-500 mt-2 text-lg">
                         {headerSubtitle}
@@ -609,7 +1008,7 @@
                       <div className="flex flex-wrap sm:flex-nowrap bg-slate-200 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
                         {['30', '40', '50', '55'].map(tab => (
                           <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-300/50'}`}>
-                            <Icon path={icons.Users} className="w-4 h-4" /> {tab}歲方案
+                            <Icon path={icons.Users} className="w-4 h-4" /> {tab}{language==='en'?'':'歲'}
                           </button>
                         ))}
                       </div>
@@ -623,20 +1022,19 @@
                     </div>
                   </header>
 
-                  {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
                       <div className="flex items-center gap-3 text-slate-500 mb-2">
                         <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                           <Icon path={icons.PiggyBank} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.cumulative_prem}</span>
                       </div>
                       <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
                       <div className="mt-3 space-y-1">
-                        <p className="text-sm text-slate-500">首5年 ({currentDetails.premAge})，每年 {formatCurrency(13000)}</p>
+                        <p className="text-sm text-slate-500">{t.first}5{t.years} ({parseInt(activeTab)+1}-{parseInt(activeTab)+5}歲) {t.every_year} {formatCurrency(13000)}</p>
                         <p className="text-sm text-slate-500 bg-slate-50 py-1 px-2 rounded-md inline-block">
-                          {currentDetails.accumAge}為收息期，總「收息年期」為 <span className="text-red-500 font-bold">{currentDetails.accumYears}</span>
+                          {parseInt(activeTab)+6}歲-{parseInt(currentDetails.withdrawAge)-1}歲{t.accum_period} <span className="text-red-500 font-bold">{parseInt(currentDetails.withdrawAge)-parseInt(activeTab)-6}{t.years}</span>
                         </p>
                       </div>
                     </div>
@@ -647,13 +1045,13 @@
                         <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                           <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_total_withdraw}</span>
                       </div>
                       <div className="text-3xl font-bold text-emerald-600 z-10">{formatCurrency(totalWithdrawn)}</div>
                       <div className="mt-3 space-y-1 z-10">
-                        <p className="text-sm text-slate-500">{currentDetails.withdrawAge}，每年提取 {formatCurrency(currentDetails.withdrawalAmount)}</p>
+                        <p className="text-sm text-slate-500">{currentDetails.withdrawAge}{t.every_year} {formatCurrency(currentDetails.withdrawalAmount)}</p>
                         <p className="text-sm text-slate-500 bg-emerald-50 py-1 px-2 rounded-md inline-block">
-                          總提款年期為 <span className="text-red-500 font-bold">{currentDetails.withdrawYears}</span>
+                          {t.withdraw_total_years} <span className="text-red-500 font-bold">{currentDetails.withdrawYears.replace('年', t.years)}</span>
                         </p>
                       </div>
                     </div>
@@ -663,28 +1061,27 @@
                         <div className="p-2 bg-white/10 rounded-lg text-amber-400">
                           <Icon path={icons.TrendingUp} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_legacy_value}</span>
                       </div>
-                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
-                      <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，留給摰愛</p>
+                      <div className="text-3xl font-bold text-white">{language === 'en' ? 'Up to ' : '高達 '} {formatCurrency(finalValue)}</div>
+                      <p className="text-sm text-slate-300 mt-2">138{t.legacy_desc}</p>
                     </div>
                   </div>
 
-                  {/* Chart */}
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <h2 className="text-xl font-bold text-slate-900">保單價值預測圖</h2>
+                        <h2 className="text-xl font-bold text-slate-900">{t.chart_title}</h2>
                         <div className="flex bg-slate-100 p-1.5 rounded-lg w-full sm:w-auto">
-                          <button onClick={() => setChartPeriod('all')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'all' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>全期走勢</button>
-                          <button onClick={() => setChartPeriod('active')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'active' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>供款及提取期</button>
-                          <button onClick={() => setChartPeriod('legacy')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'legacy' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>傳承期 (96歲+)</button>
+                          <button onClick={() => setChartPeriod('all')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'all' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>{t.chart_all}</button>
+                          <button onClick={() => setChartPeriod('active')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'active' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>{t.chart_active}</button>
+                          <button onClick={() => setChartPeriod('legacy')} className={`flex-1 sm:flex-none px-3 py-1.5 text-sm rounded-md transition-colors ${chartPeriod === 'legacy' ? 'bg-white shadow-sm font-semibold text-blue-600' : 'text-slate-500 hover:text-slate-800'}`}>{t.chart_legacy}</button>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>累計提取</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>預期退保價值</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>{t.legend_prem}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>{t.legend_withdraw}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>{t.legend_value}</div>
                       </div>
                     </div>
                     <div className="h-80 w-full">
@@ -705,30 +1102,29 @@
                           />
                           <RechartsTooltip 
                             formatter={(value) => formatCurrency(value)}
-                            labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                            labelFormatter={(label) => `${t.tooltip_age}: ${label}`}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                           />
-                          <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
-                          <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
-                          <Line type="monotone" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
+                          <Area type="monotone" dataKey="total" name={t.legend_value} fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                          <Line type="stepAfter" dataKey="cumulativePrem" name={t.legend_prem} stroke="#3b82f6" strokeWidth={3} dot={false} />
+                          <Line type="monotone" dataKey="cumWithdrawal" name={t.legend_withdraw} stroke="#10b981" strokeWidth={3} dot={false} />
                         </ComposedChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  {/* Table */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
                       <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
-                        年度價值明細 ({activeTab}歲方案)
+                        {t.table_title} ({activeTab}{language==='en'?'': '歲'}{t.ret_title.replace('方案','')})
                       </h2>
                       <button 
                         onClick={() => setShowDetails(!showDetails)}
                         className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
                       >
                         <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
-                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                        {showDetails ? t.hide_details : t.show_details} (A)+(B)+(C)+(D)
                       </button>
                     </div>
                     
@@ -736,19 +1132,19 @@
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">累計提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">預期總退保價值</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">{t.table_col_age}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">{t.table_col_cum_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">{t.table_col_cum_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">{t.table_col_total}</th>
                             
                             {showDetails && (
                               <React.Fragment>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">{t.table_col_gcv}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_rb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_sb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_div}</th>
                               </React.Fragment>
                             )}
                           </tr>
@@ -784,7 +1180,6 @@
             );
           };
 
-          // 教育儲蓄方案的視圖
           const renderEducation = () => {
             const totalPremium = processedEducationData[processedEducationData.length - 1].cumulativePrem;
             const totalWithdrawn = processedEducationData[processedEducationData.length - 1].cumWithdrawal;
@@ -794,25 +1189,24 @@
               <div className="max-w-7xl mx-auto space-y-6">
                   <div className="mb-2">
                       <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
-                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                       </button>
                   </div>
                   
-                  {/* Header */}
                   <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
                     <div>
                       <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                         <Icon path={icons.GraduationCap} className="w-8 h-8 text-emerald-600" />
-                        教育儲蓄方案分析
+                        {t.edu_title}{t.plan_analysis}
                       </h1>
                       <p className="text-slate-500 mt-2 text-lg">
-                        1歲幼兒 | 5年供款 | 預備大學教育基金
+                        1{t.age_kid} | 5{t.prem_years} | {t.edu_subtitle}
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
                       <div className="flex bg-emerald-100 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
                           <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-all bg-white shadow text-emerald-700 cursor-default">
-                            <Icon path={icons.Users} className="w-4 h-4" /> 1歲方案
+                            <Icon path={icons.Users} className="w-4 h-4" /> 1{language==='en'?'':'歲'}{t.plan_analysis.replace('分析','')}
                           </button>
                       </div>
                       <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
@@ -825,20 +1219,19 @@
                     </div>
                   </header>
 
-                  {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
                       <div className="flex items-center gap-3 text-slate-500 mb-2">
                         <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                           <Icon path={icons.PiggyBank} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.cumulative_prem}</span>
                       </div>
                       <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
                       <div className="mt-3 space-y-1">
-                        <p className="text-sm text-slate-500">首5年 (2-6歲)，每年 {formatCurrency(13000)}</p>
+                        <p className="text-sm text-slate-500">{t.first}5{t.years} (2-6歲)，{t.every_year} {formatCurrency(13000)}</p>
                         <p className="text-sm text-emerald-700 bg-emerald-50 py-1 px-2 rounded-md inline-block font-medium">
-                          7歲-19歲為滾存期，總「滾存年期」為 <span className="text-red-500 font-bold">13年</span>
+                          7歲-19歲{t.edu_accum_years} <span className="text-red-500 font-bold">13{t.years}</span>
                         </p>
                       </div>
                     </div>
@@ -849,13 +1242,13 @@
                         <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
                           <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_total_withdraw}</span>
                       </div>
                       <div className="text-3xl font-bold text-emerald-600 z-10">{formatCurrency(totalWithdrawn)}</div>
                       <div className="mt-3 space-y-1 z-10">
-                        <p className="text-sm text-slate-500">20歲至22歲，每年提取 {formatCurrency(50000)}作大學學費</p>
+                        <p className="text-sm text-slate-500">{language==='en'?'':'20'}{t.edu_withdraw_desc}{language==='en'?'20':''} {formatCurrency(50000)}{t.edu_tuition}</p>
                         <p className="text-sm text-emerald-700 bg-emerald-50 py-1 px-2 rounded-md inline-block font-medium">
-                          總提款年期為 <span className="text-red-500 font-bold">3年</span>
+                          {t.withdraw_total_years} <span className="text-red-500 font-bold">3{t.years}</span>
                         </p>
                       </div>
                     </div>
@@ -865,109 +1258,105 @@
                         <div className="p-2 bg-white/10 rounded-lg text-amber-400">
                           <Icon path={icons.TrendingUp} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_legacy_value}</span>
                       </div>
-                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
-                    <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，將財富跨代傳承</p>
-                  </div>
-                </div>
-
-                {/* Chart */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <h2 className="text-xl font-bold text-slate-900">保單價值預測圖 (兩段式分析)</h2>
-                    </div>
-                    <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>累計提取</div>
-                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>預期退保價值</div>
+                      <div className="text-3xl font-bold text-white">{language==='en'?'Up to ':'高達 '} {formatCurrency(finalValue)}</div>
+                      <p className="text-sm text-slate-300 mt-2">138{t.legacy_desc_edu}</p>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* 第一段：1-22歲 學業期 */}
-                    <div className="flex flex-col">
-                      <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">第一段：學業及提取期 (1-22歲)</h3>
-                      <div className="h-72 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart data={processedEducationData.filter(d => d.age <= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                            <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={2} />
-                            <YAxis 
-                              tickFormatter={(val) => {
-                                const converted = currency === 'HKD' ? val * exchangeRate : val;
-                                if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
-                                return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
-                              }} 
-                              tick={{ fill: '#64748b' }} 
-                              axisLine={false} 
-                              tickLine={false} 
-                              width={65}
-                            />
-                            <RechartsTooltip 
-                              formatter={(value) => formatCurrency(value)}
-                              labelFormatter={(label) => `被保人年齡: ${label}歲`}
-                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            />
-                            <ReferenceArea x1={19} x2={22} fill="#10b981" fillOpacity={0.15} strokeOpacity={0} />
-                            <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
-                            <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
-                            <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <p className="text-xs text-center text-emerald-600 mt-2 font-medium">↑ 綠色範圍為 19-22歲 大學學費提取期</p>
-                    </div>
 
-                    {/* 第二段：23歲+ 財富滾存期 */}
-                    <div className="flex flex-col">
-                      <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">第二段：財富滾存期 (23歲起)</h3>
-                      <div className="h-72 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart data={processedEducationData.filter(d => d.age >= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                            <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={20} />
-                            <YAxis 
-                              tickFormatter={(val) => {
-                                const converted = currency === 'HKD' ? val * exchangeRate : val;
-                                if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
-                                return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
-                              }} 
-                              tick={{ fill: '#64748b' }} 
-                              axisLine={false} 
-                              tickLine={false} 
-                              width={65}
-                            />
-                            <RechartsTooltip 
-                              formatter={(value) => formatCurrency(value)}
-                              labelFormatter={(label) => `被保人年齡: ${label}歲`}
-                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                            />
-                            <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
-                            <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
-                            <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#10b981" strokeWidth={3} dot={false} />
-                          </ComposedChart>
-                        </ResponsiveContainer>
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <h2 className="text-xl font-bold text-slate-900">{t.chart_split_title}</h2>
                       </div>
-                      <p className="text-xs text-center text-slate-400 mt-2">↑ 23歲起停止提取，預期價值享受複息滾存效應</p>
+                      <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>{t.legend_prem}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full"></div>{t.legend_withdraw}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>{t.legend_value}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="flex flex-col">
+                        <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">{language==='en'?'Part 1: ':'第一段：'}{t.chart_study}</h3>
+                        <div className="h-72 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={processedEducationData.filter(d => d.age <= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={2} />
+                              <YAxis 
+                                tickFormatter={(val) => {
+                                  const converted = currency === 'HKD' ? val * exchangeRate : val;
+                                  if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                                  return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                                }} 
+                                tick={{ fill: '#64748b' }} 
+                                axisLine={false} 
+                                tickLine={false} 
+                                width={65}
+                              />
+                              <RechartsTooltip 
+                                formatter={(value) => formatCurrency(value)}
+                                labelFormatter={(label) => `${t.tooltip_age}: ${label}`}
+                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                              />
+                              <ReferenceArea x1={19} x2={22} fill="#10b981" fillOpacity={0.15} strokeOpacity={0} />
+                              <Area type="monotone" dataKey="total" name={t.legend_value} fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                              <Line type="stepAfter" dataKey="cumulativePrem" name={t.legend_prem} stroke="#3b82f6" strokeWidth={3} dot={false} />
+                              <Line type="stepAfter" dataKey="cumWithdrawal" name={t.legend_withdraw} stroke="#10b981" strokeWidth={3} dot={false} />
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <p className="text-xs text-center text-emerald-600 mt-2 font-medium">{t.chart_label_study}</p>
+                      </div>
+
+                      <div className="flex flex-col">
+                        <h3 className="text-center font-semibold text-slate-700 mb-4 bg-slate-100 py-2 rounded-lg">{language==='en'?'Part 2: ':'第二段：'}{t.chart_accum}</h3>
+                        <div className="h-72 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={processedEducationData.filter(d => d.age >= 22)} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis dataKey="age" tick={{ fill: '#64748b' }} axisLine={false} tickLine={false} minTickGap={20} />
+                              <YAxis 
+                                tickFormatter={(val) => {
+                                  const converted = currency === 'HKD' ? val * exchangeRate : val;
+                                  if (converted >= 1000000) return (currency === 'HKD' ? 'HK$' : '$') + (converted/1000000).toFixed(1) + 'M';
+                                  return (currency === 'HKD' ? 'HK$' : '$') + Math.round(converted/1000) + 'k';
+                                }} 
+                                tick={{ fill: '#64748b' }} 
+                                axisLine={false} 
+                                tickLine={false} 
+                                width={65}
+                              />
+                              <RechartsTooltip 
+                                formatter={(value) => formatCurrency(value)}
+                                labelFormatter={(label) => `${t.tooltip_age}: ${label}`}
+                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                              />
+                              <Area type="monotone" dataKey="total" name={t.legend_value} fill="#fef3c7" stroke="#f59e0b" strokeWidth={3} />
+                              <Line type="stepAfter" dataKey="cumulativePrem" name={t.legend_prem} stroke="#3b82f6" strokeWidth={3} dot={false} />
+                              <Line type="stepAfter" dataKey="cumWithdrawal" name={t.legend_withdraw} stroke="#10b981" strokeWidth={3} dot={false} />
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                        </div>
+                        <p className="text-xs text-center text-slate-400 mt-2">{t.chart_label_accum}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Table */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
                       <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
-                        年度價值明細 (1歲教育儲蓄方案)
+                        {t.table_title} (1{language==='en'?'': '歲'}{t.edu_title.replace('方案','')})
                       </h2>
                       <button 
                         onClick={() => setShowDetails(!showDetails)}
                         className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
                       >
                         <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
-                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                        {showDetails ? t.hide_details : t.show_details} (A)+(B)+(C)+(D)
                       </button>
                     </div>
                     
@@ -975,19 +1364,19 @@
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">累計提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">預期總退保價值</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">{t.table_col_age}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">{t.table_col_cum_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-emerald-700 bg-emerald-50/90">{t.table_col_cum_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">{t.table_col_total}</th>
                             
                             {showDetails && (
                               <React.Fragment>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">{t.table_col_gcv}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_rb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_sb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_div}</th>
                               </React.Fragment>
                             )}
                           </tr>
@@ -1002,7 +1391,6 @@
                               <td className="p-4 text-right text-slate-600">{row.prem > 0 ? formatCurrency(row.prem) : '-'}</td>
                               <td className="p-4 text-right font-medium text-blue-700 bg-blue-50/10">{formatCurrency(row.cumulativePrem)}</td>
                               
-                              {/* 帶有 Tooltip 的提取欄位 */}
                               <td className="p-4 text-right font-semibold text-emerald-600">
                                 {row.w > 0 ? (
                                   <div className="group relative inline-flex items-center justify-end cursor-help">
@@ -1010,12 +1398,11 @@
                                       <Icon path={icons.Info} className="w-4 h-4 text-emerald-500" />
                                       {formatCurrency(row.w)}
                                     </span>
-                                    {/* 向左側彈出的提示框 */}
                                     <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all">
                                         <div>
-                                          {row.age === 20 && <span className="font-bold text-base mt-1 inline-block">大學一年級學費</span>}
-                                          {row.age === 21 && <span className="font-bold text-base mt-1 inline-block">大學二年級學費</span>}
-                                          {row.age === 22 && <span className="font-bold text-base mt-1 inline-block">大學三年級學費</span>}
+                                          {row.age === 20 && <span className="font-bold text-base mt-1 inline-block">{t.edu_uni_1}</span>}
+                                          {row.age === 21 && <span className="font-bold text-base mt-1 inline-block">{t.edu_uni_2}</span>}
+                                          {row.age === 22 && <span className="font-bold text-base mt-1 inline-block">{t.edu_uni_3}</span>}
                                         </div>
                                         <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
                                     </div>
@@ -1025,7 +1412,6 @@
 
                               <td className="p-4 text-right font-medium text-emerald-700 bg-emerald-50/10">{formatCurrency(row.cumWithdrawal)}</td>
                               
-                              {/* 帶有 Tooltip 的預期總退保價值欄位 (針對 36 歲) */}
                               <td className="p-4 text-right font-bold text-amber-600 bg-amber-50/10">
                                 {row.age === 36 ? (
                                   <div className="group relative inline-flex items-center justify-end cursor-help">
@@ -1033,9 +1419,8 @@
                                       <Icon path={icons.Info} className="w-4 h-4 text-amber-500" />
                                       {formatCurrency(row.total)}
                                     </span>
-                                    {/* 向左側彈出的提示框 */}
                                     <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all whitespace-normal leading-relaxed">
-                                        <div>可取消戶口，用作<span className="text-amber-400 font-bold">置業、創業、再進修</span>等等用途</div>
+                                        <div>{t.edu_cancel_account}<span className="text-amber-400 font-bold">{t.edu_cancel_use}</span>{t.edu_cancel_etc}</div>
                                         <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
                                     </div>
                                   </div>
@@ -1062,7 +1447,6 @@
             );
           };
 
-          // 傳承方案的視圖
           const renderLegacy = () => {
             const totalPremium = processedLegacyData[processedLegacyData.length - 1].cumulativePrem;
             const totalWithdrawn = processedLegacyData[processedLegacyData.length - 1].cumWithdrawal;
@@ -1072,25 +1456,24 @@
               <div className="max-w-7xl mx-auto space-y-6">
                   <div className="mb-2">
                       <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
-                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                          <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                       </button>
                   </div>
                   
-                  {/* Header */}
                   <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
                     <div>
                       <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                         <Icon path={icons.Diamond} className="w-8 h-8 text-amber-600" />
-                        傳承方案分析
+                        {t.leg_title}{t.plan_analysis}
                       </h1>
                       <p className="text-slate-500 mt-2 text-lg">
-                        60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案
+                        {t.leg_subtitle}
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
                       <div className="flex bg-amber-100 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
                           <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-all bg-white shadow text-amber-700 cursor-default">
-                            <Icon path={icons.Users} className="w-4 h-4" /> 60歲方案
+                            <Icon path={icons.Users} className="w-4 h-4" /> 60{language==='en'?'':'歲'}{t.plan_analysis.replace('分析','')}
                           </button>
                       </div>
                       <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
@@ -1103,20 +1486,19 @@
                     </div>
                   </header>
 
-                  {/* Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-start">
                       <div className="flex items-center gap-3 text-slate-500 mb-2">
                         <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
                           <Icon path={icons.PiggyBank} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">累計總供款</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.cumulative_prem}</span>
                       </div>
                       <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
                       <div className="mt-3 space-y-1">
-                        <p className="text-sm text-slate-500">首2年 (61-62歲)，每年 {formatCurrency(1000000)}</p>
+                        <p className="text-sm text-slate-500">{t.first}2{t.years} (61-62歲)，{t.every_year} {formatCurrency(1000000)}</p>
                         <p className="text-sm text-amber-700 bg-amber-50 py-1 px-2 rounded-md inline-block font-medium">
-                          極速2年短暫供款期
+                          {t.leg_prem_desc}
                         </p>
                       </div>
                     </div>
@@ -1127,13 +1509,13 @@
                         <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
                           <Icon path={icons.ArrowRightLeft} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預計總提取資金</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_total_withdraw}</span>
                       </div>
                       <div className="text-3xl font-bold text-amber-600 z-10">{formatCurrency(totalWithdrawn)}</div>
                       <div className="mt-3 space-y-1 z-10">
-                        <p className="text-sm text-slate-500">分別於 83歲, 90歲 及 95歲 大額提取</p>
+                        <p className="text-sm text-slate-500">{t.leg_withdraw_desc}</p>
                         <p className="text-sm text-amber-700 bg-amber-50 py-1 px-2 rounded-md inline-block font-medium">
-                          傳承家族財富與設立社會基金
+                          {t.leg_withdraw_purpose}
                         </p>
                       </div>
                     </div>
@@ -1143,23 +1525,22 @@
                         <div className="p-2 bg-white/10 rounded-lg text-amber-400">
                           <Icon path={icons.TrendingUp} className="w-6 h-6" />
                         </div>
-                        <span className="font-semibold text-sm tracking-wide uppercase">預期滾存傳承價值</span>
+                        <span className="font-semibold text-sm tracking-wide uppercase">{t.est_legacy_value}</span>
                       </div>
-                      <div className="text-3xl font-bold text-white">高達 {formatCurrency(finalValue)}</div>
-                      <p className="text-sm text-slate-300 mt-2">138歲時預期退保價值，留給摰愛</p>
+                      <div className="text-3xl font-bold text-white">{language==='en'?'Up to ':'高達 '} {formatCurrency(finalValue)}</div>
+                      <p className="text-sm text-slate-300 mt-2">138{t.legacy_desc}</p>
                     </div>
                   </div>
 
-                  {/* Chart */}
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <h2 className="text-xl font-bold text-slate-900">保單價值預測圖</h2>
+                        <h2 className="text-xl font-bold text-slate-900">{t.chart_title}</h2>
                       </div>
                       <div className="flex flex-wrap gap-4 mt-2 sm:mt-0 text-sm">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>累計供款</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>累計提取</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 rounded-full"></div>預期退保價值</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-500 rounded-full"></div>{t.legend_prem}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-500 rounded-full"></div>{t.legend_withdraw}</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 rounded-full"></div>{t.legend_value}</div>
                       </div>
                     </div>
                     <div className="h-80 w-full">
@@ -1180,30 +1561,29 @@
                           />
                           <RechartsTooltip 
                             formatter={(value) => formatCurrency(value)}
-                            labelFormatter={(label) => `被保人年齡: ${label}歲`}
+                            labelFormatter={(label) => `${t.tooltip_age}: ${label}`}
                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                           />
-                          <Area type="monotone" dataKey="total" name="預期總退保價值" fill="#f1f5f9" stroke="#1e293b" strokeWidth={3} />
-                          <Line type="stepAfter" dataKey="cumulativePrem" name="累計供款" stroke="#3b82f6" strokeWidth={3} dot={false} />
-                          <Line type="stepAfter" dataKey="cumWithdrawal" name="累計提取總額" stroke="#f59e0b" strokeWidth={3} dot={false} />
+                          <Area type="monotone" dataKey="total" name={t.legend_value} fill="#f1f5f9" stroke="#1e293b" strokeWidth={3} />
+                          <Line type="stepAfter" dataKey="cumulativePrem" name={t.legend_prem} stroke="#3b82f6" strokeWidth={3} dot={false} />
+                          <Line type="stepAfter" dataKey="cumWithdrawal" name={t.legend_withdraw} stroke="#f59e0b" strokeWidth={3} dot={false} />
                         </ComposedChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  {/* Table */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
                       <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <Icon path={icons.Coins} className="w-6 h-6 text-slate-600" />
-                        年度價值明細 (60歲傳承方案)
+                        {t.table_title} (60{language==='en'?'':'歲'}{t.leg_title.replace('方案','')})
                       </h2>
                       <button 
                         onClick={() => setShowDetails(!showDetails)}
                         className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium shadow-sm focus:outline-none"
                       >
                         <Icon path={showDetails ? icons.EyeOff : icons.Eye} className="w-4 h-4" />
-                        {showDetails ? '隱藏' : '顯示'}分項數據 (A)+(B)+(C)+(D)
+                        {showDetails ? t.hide_details : t.show_details} (A)+(B)+(C)+(D)
                       </button>
                     </div>
                     
@@ -1211,19 +1591,19 @@
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">年齡</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">累計供款</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">當年提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">累計提取</th>
-                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-slate-800 bg-slate-100/90">預期總退保價值</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-center bg-slate-50">{t.table_col_age}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-blue-700 bg-blue-50/90">{t.table_col_cum_prem}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-50">{t.table_col_cur_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-amber-700 bg-amber-50/90">{t.table_col_cum_w}</th>
+                            <th className="p-4 font-semibold border-b border-slate-200 text-right text-slate-800 bg-slate-100/90">{t.table_col_total}</th>
                             
                             {showDetails && (
                               <React.Fragment>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">(A)保證現金價值</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(B)歸原紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(C)特別紅利</th>
-                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">(D)紅利鎖定</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100 border-l border-slate-300">{t.table_col_gcv}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_rb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_sb}</th>
+                                <th className="p-4 font-semibold border-b border-slate-200 text-right bg-slate-100">{t.table_col_div}</th>
                               </React.Fragment>
                             )}
                           </tr>
@@ -1238,7 +1618,6 @@
                               <td className="p-4 text-right text-slate-600">{row.prem > 0 ? formatCurrency(row.prem) : '-'}</td>
                               <td className="p-4 text-right font-medium text-blue-700 bg-blue-50/10">{formatCurrency(row.cumulativePrem)}</td>
                               
-                              {/* 帶有 Tooltip 的提取欄位 */}
                               <td className="p-4 text-right font-semibold text-amber-600">
                                 {row.w > 0 ? (
                                   <div className="group relative inline-flex items-center justify-end cursor-help">
@@ -1246,12 +1625,11 @@
                                       <Icon path={icons.Info} className="w-4 h-4 text-amber-500" />
                                       {formatCurrency(row.w)}
                                     </span>
-                                    {/* 向左側彈出的提示框 */}
                                     <div className="hidden group-hover:flex absolute right-full top-1/2 -translate-y-1/2 mr-3 w-max max-w-[280px] bg-slate-800 text-white text-sm rounded-xl shadow-2xl p-4 z-[100] text-left transition-all">
                                         <div>
-                                          {row.age === 83 && <span>送給孫子的愛，<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">人生第一份創業資金</span></span>}
-                                          {row.age === 90 && <span>送給孫子的愛，<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">結婚安樂窩</span></span>}
-                                          {row.age === 95 && <span>取之於社會用之於社會，設立<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">社會基金 ，回饋社會</span></span>}
+                                          {row.age === 83 && <span>{t.leg_tip_1_title}<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">{t.leg_tip_1_hl}</span></span>}
+                                          {row.age === 90 && <span>{t.leg_tip_2_title}<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">{t.leg_tip_2_hl}</span></span>}
+                                          {row.age === 95 && <span>{t.leg_tip_3_title}<br/><span className="text-red-400 font-bold text-base mt-1 inline-block">{t.leg_tip_3_hl}</span></span>}
                                         </div>
                                         <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-0 h-0 border-y-[8px] border-y-transparent border-l-[8px] border-l-slate-800"></div>
                                     </div>
@@ -1280,14 +1658,162 @@
             );
           };
 
+          const renderLegacyAnimation = () => {
+            const steps = [
+              {
+                title: t.anim_step0_title,
+                desc: t.anim_step0_desc,
+                policy: t.anim_step0_policy,
+                color: "bg-orange-500",
+                textColor: "text-orange-500",
+                value: null,
+                icon: icons.User
+              },
+              {
+                title: t.anim_step1_title,
+                desc: t.anim_step1_desc,
+                color: "bg-teal-600",
+                textColor: "text-teal-600",
+                value: {
+                  label: t.anim_step1_label,
+                  amount: "$9,026,224",
+                  percent: t.anim_step1_pct
+                },
+                icon: icons.User
+              },
+              {
+                title: t.anim_step2_title,
+                desc: t.anim_step2_desc,
+                color: "bg-emerald-400",
+                textColor: "text-emerald-500",
+                value: {
+                  label: t.anim_step1_label,
+                  amount: "$32,983,507",
+                  percent: t.anim_step2_pct
+                },
+                icon: icons.User
+              },
+              {
+                title: t.anim_step3_title,
+                desc: t.anim_step3_desc,
+                color: "bg-slate-700",
+                textColor: "text-slate-700",
+                value: {
+                  label: t.anim_step1_label,
+                  amount: "$298,908,263",
+                  percent: t.anim_step3_pct
+                },
+                icon: icons.Diamond
+              }
+            ];
+
+            return (
+              <div className="max-w-6xl mx-auto py-8 space-y-8">
+                <div className="flex items-center justify-between">
+                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-rose-600 transition-colors font-medium">
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
+                    </button>
+                    <button 
+                        onClick={() => setAnimationStep(0)} 
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors text-sm font-semibold"
+                    >
+                        <Icon path={icons.RotateCcw} className="w-4 h-4" /> {t.anim_replay}
+                    </button>
+                </div>
+
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold text-slate-900 mb-4 flex items-center justify-center gap-3">
+                    <Icon path={icons.PlayCircle} className="w-8 h-8 text-rose-500" />
+                    {t.anim_main_title}
+                  </h2>
+                  <p className="text-slate-500">{t.anim_sub_title}</p>
+                </div>
+
+                <div className="relative pt-28 pb-40 px-4 bg-white rounded-3xl shadow-sm border border-slate-200">
+                    <div className="absolute top-1/2 left-0 w-full h-2 bg-orange-500 -translate-y-1/2 flex items-center z-0">
+                        <div className="absolute right-0 w-0 h-0 border-y-[10px] border-y-transparent border-l-[16px] border-l-orange-500"></div>
+                    </div>
+
+                    <div className="relative z-10 flex justify-between w-full h-[400px]">
+                        {steps.map((step, index) => {
+                            const isVisible = animationStep >= index;
+                            return (
+                                <div key={index} className={`flex-1 flex flex-col items-center justify-center relative transition-all duration-700 ease-in-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                                    
+                                    <div className={`absolute bottom-[calc(50%+3.5rem)] w-[90%] bg-white border-2 ${index === 0 ? 'border-orange-500' : index === 1 ? 'border-teal-600' : index === 2 ? 'border-emerald-400' : 'border-slate-700'} rounded-xl p-4 shadow-lg text-center transition-transform duration-500 delay-150 z-30 ${isVisible ? 'scale-100' : 'scale-0'}`}>
+                                        <p className="text-[15px] leading-relaxed font-semibold text-slate-800 whitespace-pre-line">{step.desc}</p>
+                                        <div className={`absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b-2 border-r-2 ${index === 0 ? 'border-orange-500' : index === 1 ? 'border-teal-600' : index === 2 ? 'border-emerald-400' : 'border-slate-700'} rotate-45`}></div>
+                                    </div>
+
+                                    <div className={`w-[90%] py-3 sm:py-4 ${step.color} text-white font-bold text-sm sm:text-lg rounded-full flex items-center justify-center gap-2 shadow-xl absolute top-1/2 -translate-y-1/2 z-20`}>
+                                        <Icon path={step.icon} className="w-5 h-5 sm:w-6 sm:h-6" />
+                                        {step.title}
+                                    </div>
+
+                                    {index > 0 && (
+                                        <div className="absolute top-[calc(50%+2.5rem)] text-orange-600 font-bold text-2xl z-10">
+                                            {index === 1 ? '25' : index === 2 ? '45' : '80'}
+                                        </div>
+                                    )}
+
+                                    <div className={`absolute top-[calc(50%+5.5rem)] w-full flex flex-col items-center transition-all duration-500 delay-300 z-30 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                                        {index === 0 ? (
+                                            <div className="bg-orange-50 p-5 rounded-xl border border-orange-200 text-center w-[90%] shadow-md mt-2">
+                                                <p className="text-[15px] leading-relaxed font-bold text-orange-800 whitespace-pre-line">{step.policy}</p>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center mt-3">
+                                                <div className="flex items-end mb-4">
+                                                    <div className="w-12 h-12 bg-yellow-400 rounded-full border-4 border-yellow-500 -mr-4 relative z-10 shadow-sm"></div>
+                                                    <div className={`w-14 h-14 bg-yellow-400 rounded-full border-4 border-yellow-500 relative z-20 shadow-md transition-transform duration-700 delay-500 ${index === 3 ? 'scale-125 origin-bottom' : ''}`}></div>
+                                                </div>
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xl text-center w-max min-w-[180px]">
+                                                    <p className="text-sm text-slate-500 mb-1">{step.value.label}</p>
+                                                    <p className={`text-xl sm:text-2xl font-extrabold ${step.textColor}`}>{step.value.amount}</p>
+                                                    <p className="text-sm text-slate-400 mt-2">{step.value.percent}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="flex justify-center mt-12">
+                    {animationStep < 3 ? (
+                        <button 
+                            onClick={() => setAnimationStep(prev => prev + 1)}
+                            className="group flex items-center gap-2 px-10 py-4 bg-rose-600 hover:bg-rose-700 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+                        >
+                            {t.anim_next} <Icon path={icons.ChevronRight} className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={() => setAnimationStep(0)}
+                            className="flex items-center gap-2 px-10 py-4 bg-slate-800 hover:bg-slate-900 text-white text-xl font-bold rounded-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+                        >
+                            <Icon path={icons.RotateCcw} className="w-6 h-6" /> {t.anim_rewatch}
+                        </button>
+                    )}
+                </div>
+              </div>
+            );
+          };
+
           return (
-            <div className="min-h-screen text-slate-800 font-sans bg-slate-50 p-4 sm:p-8">
-              {currentView === 'home' && renderHome()}
-              {currentView === 'features' && renderFeatures()}
-              {currentView === 'retirement' && renderRetirement()}
-              {currentView === 'education' && renderEducation()}
-              {currentView === 'legacy' && renderLegacy()}
-              {currentView === 'special' && renderPlaceholder('特別方案')}
+            <div className="min-h-screen text-slate-800 font-sans bg-slate-50">
+              <TopNav />
+              <div className="p-4 sm:p-8">
+                {currentView === 'home' && renderHome()}
+                {currentView === 'features' && renderFeatures()}
+                {currentView === 'retirement' && renderRetirement()}
+                {currentView === 'education' && renderEducation()}
+                {currentView === 'legacy' && renderLegacy()}
+                {currentView === 'legacyAnimation' && renderLegacyAnimation()}
+                {currentView === 'special' && renderPlaceholder(t.spec_title)}
+              </div>
             </div>
           );
         }
