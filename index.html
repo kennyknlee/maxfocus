@@ -95,7 +95,7 @@
                 leg_subtitle: "60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案",
                 leg_prem_desc: "極速2年短暫供款期",
                 leg_withdraw_desc: "分別於 83歲, 90歲 及 95歲 大額提取",
-                leg_withdraw_purpose: "傳承家族財富與設立社會基金",
+                leg_withdraw_purpose: "傳承家族财富與設立社會基金",
                 leg_tip_1_title: "送給孫子的愛，",
                 leg_tip_1_hl: "人生第一份創業資金",
                 leg_tip_2_title: "送給孫子的愛，",
@@ -122,7 +122,6 @@
                 anim_step3_pct: "(佔繳付保費總額的14945%)",
                 uc_title: "正在建設中",
                 uc_desc: "此方案的數據與內容即將推出，敬請期待。",
-                // 自訂方案對比專用
                 comp_plan_a: "方案 A",
                 comp_plan_b: "方案 B",
                 comp_basic_set: "基本供款設定 - USD",
@@ -143,7 +142,11 @@
                 comp_w_period: "提款期",
                 comp_total_prem: "總供款",
                 comp_total_w: "總提款",
-                comp_remain_val: "剩餘戶口價值"
+                comp_remain_val: "剩餘戶口價值",
+                ai_btn: "✨ AI 智能方案對比",
+                ai_loading: "顧問 AI 正在努力運算與分析您的理財方案中...",
+                ai_error: "抱歉，AI 分析目前無法連線。請稍後再試。",
+                ai_advisor_title: "✨ 您的 AI 專屬理財顧問分析"
             },
             sc: {
                 home: "返回主页",
@@ -266,7 +269,11 @@
                 comp_w_period: "提款期",
                 comp_total_prem: "总供款",
                 comp_total_w: "总提款",
-                comp_remain_val: "剩余户口价值"
+                comp_remain_val: "剩余户口价值",
+                ai_btn: "✨ AI 智能方案对比",
+                ai_loading: "顾问 AI 正在努力运算与分析您的理财方案中...",
+                ai_error: "抱歉，AI 分析目前无法连线。请稍后再试。",
+                ai_advisor_title: "✨ 您的 AI 专属理财顾问分析"
             },
             en: {
                 home: "Back to Home",
@@ -389,7 +396,11 @@
                 comp_w_period: "Withdrawal Period",
                 comp_total_prem: "Total Prem",
                 comp_total_w: "Total W/D",
-                comp_remain_val: "Remaining Value"
+                comp_remain_val: "Remaining Value",
+                ai_btn: "✨ AI Smart Plan Comparison",
+                ai_loading: "Advisor AI is analyzing your financial plans...",
+                ai_error: "Sorry, AI analysis is currently unavailable. Please try again later.",
+                ai_advisor_title: "✨ Your Exclusive AI Advisor Analysis"
             }
         };
 
@@ -424,7 +435,8 @@
             RotateCcw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
             User: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
             Globe: '<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
-            SettingsSliders: '<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>'
+            SettingsSliders: '<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>',
+            Sparkles: '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 3v4"/><path d="M17 5h4"/>'
         };
 
         // 1歲教育儲蓄方案數據 (5年供款, 每年 USD 13,000)
@@ -696,6 +708,11 @@
           const [exchangeRate, setExchangeRate] = useState(7.8); 
           const [chartPeriod, setChartPeriod] = useState('active'); 
           const [animationStep, setAnimationStep] = useState(0);
+
+          // --- Gemini AI 狀態 ---
+          const [aiLoading, setAiLoading] = useState(false);
+          const [aiResult, setAiResult] = useState(null);
+          const [aiError, setAiError] = useState(null);
           
           // --- 自訂方案比較 狀態 ---
           const [compTableVisible, setCompTableVisible] = useState(false);
@@ -723,6 +740,12 @@
               })
               .catch(err => console.log('匯率獲取失敗，使用預設值 7.8'));
           }, []);
+
+          // 清除 AI 分析結果當頁面或數據改變時
+          useEffect(() => {
+            setAiResult(null);
+            setAiError(null);
+          }, [currentView, planA, planB, language, currency]);
 
           const formatCurrency = (value) => {
             if(value === '-' || value === undefined) return value;
@@ -788,6 +811,122 @@
                   totalW: Math.max(wYears, 0) * planB.wAmount
               };
           }, [planB]);
+
+          // ===== 修復 React #310 錯誤：將 renderRetirement 內的 useMemo 提升到此處 =====
+          const retirementTimelineConfig = useMemo(() => {
+              const configs = {
+                  '30': { premStart: 31, premEnd: 35, wStart: 61, wEnd: 95, premAmount: 13000, wAmount: 27000 },
+                  '40': { premStart: 41, premEnd: 45, wStart: 66, wEnd: 95, premAmount: 13000, wAmount: 20000 },
+                  '50': { premStart: 51, premEnd: 55, wStart: 71, wEnd: 95, premAmount: 13000, wAmount: 16000 },
+                  '55': { premStart: 56, premEnd: 60, wStart: 71, wEnd: 90, premAmount: 13000, wAmount: 12000 }
+              };
+              const conf = { ...configs[activeTab] };
+              
+              // 尋找提款完結年齡時的剩餘戶口價值
+              const wEndData = processedRetirementData.find(d => d.age === conf.wEnd);
+              conf.wEndSurrender = wEndData ? wEndData.total : 0;
+              
+              return conf;
+          }, [activeTab, processedRetirementData]);
+
+          const retirementTimelineCompResult = useMemo(() => {
+              return {
+                  totalPrem: (retirementTimelineConfig.premEnd - retirementTimelineConfig.premStart + 1) * retirementTimelineConfig.premAmount,
+                  totalW: (retirementTimelineConfig.wEnd - retirementTimelineConfig.wStart + 1) * retirementTimelineConfig.wAmount
+              };
+          }, [retirementTimelineConfig]);
+          // ===============================================================================
+
+          // --- Gemini AI API 呼叫 ---
+          const handleAIAnalysis = async () => {
+              setAiLoading(true);
+              setAiError(null);
+              setAiResult(null);
+
+              const apiKey = ""; // API Key injected at runtime
+              const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+              const requestedLanguage = language === 'en' ? 'English' : language === 'tc' ? 'Traditional Chinese (zh-HK)' : 'Simplified Chinese (zh-CN)';
+              
+              const prompt = `As a professional financial advisor, analyze and compare these two custom setups for the "Wealth Advance II Savings Plan". Provide your response in ${requestedLanguage}.
+              
+              Plan A (方案 A): 
+              - Contribution: ${planA.premEnd - planA.premStart + 1} years, ${formatCurrency(planA.premAmount)} annually. Total Contribution: ${formatCurrency(compResultA.totalPrem)}.
+              - Withdrawal: ${planA.wEnd - planA.wStart + 1} years, ${formatCurrency(planA.wAmount)} annually. Total Withdrawn: ${formatCurrency(compResultA.totalW)}.
+              - Remaining Account Value at age ${planA.wEnd}: ${formatCurrency(planA.wEndSurrender)}.
+              
+              Plan B (方案 B):
+              - Contribution: ${planB.premEnd - planB.premStart + 1} years, ${formatCurrency(planB.premAmount)} annually. Total Contribution: ${formatCurrency(compResultB.totalPrem)}.
+              - Withdrawal: ${planB.wEnd - planB.wStart + 1} years, ${formatCurrency(planB.wAmount)} annually. Total Withdrawn: ${formatCurrency(compResultB.totalW)}.
+              - Remaining Account Value at age ${planB.wEnd}: ${formatCurrency(planB.wEndSurrender)}.
+
+              Please provide:
+              1. A brief summary of the differences.
+              2. Which plan is better for short-term liquidity vs. long-term wealth accumulation.
+              3. A professional recommendation on how to choose between them based on different life goals.
+              Use simple bullet points and a friendly, supportive tone. Do not use overly complex markdown, just bold text and bullet points.`;
+
+              let retries = 0;
+              const maxRetries = 5;
+              const delays = [1000, 2000, 4000, 8000, 16000];
+
+              while (retries <= maxRetries) {
+                  try {
+                      const response = await fetch(url, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                              contents: [{ parts: [{ text: prompt }] }],
+                              systemInstruction: { parts: [{ text: "You are a professional, helpful, and concise financial advisor AI. Use simple formatting." }] }
+                          })
+                      });
+
+                      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                      const data = await response.json();
+                      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                      
+                      if (text) {
+                          setAiResult(text);
+                          setAiLoading(false);
+                          return;
+                      } else {
+                          throw new Error("No response from AI");
+                      }
+                  } catch (error) {
+                      if (retries === maxRetries) {
+                          console.error("AI Error:", error);
+                          setAiError(t.ai_error);
+                          setAiLoading(false);
+                          return;
+                      }
+                      await new Promise(res => setTimeout(res, delays[retries]));
+                      retries++;
+                  }
+              }
+          };
+
+          // --- 格式化 Markdown 文本為簡單的 HTML ---
+          const formatAIText = (text) => {
+              if (!text) return null;
+              // 簡單處理換行和粗體
+              const paragraphs = text.split('\n');
+              return paragraphs.map((para, index) => {
+                  if (para.trim() === '') return <br key={index} />;
+                  
+                  // 處理粗體 **text**
+                  const parts = para.split(/(\*\*.*?\*\*)/g);
+                  return (
+                      <p key={index} className="mb-2 text-slate-700 leading-relaxed">
+                          {parts.map((part, i) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                  return <strong key={i} className="text-slate-900">{part.slice(2, -2)}</strong>;
+                              }
+                              return part;
+                          })}
+                      </p>
+                  );
+              });
+          };
 
           // --- 時間軸圖表組件 ---
           const renderTimeline = (planConfig, compResult) => {
@@ -1242,6 +1381,11 @@
                       <div className="text-3xl font-bold text-white">{language === 'en' ? 'Up to ' : '高達 '} {formatCurrency(finalValue)}</div>
                       <p className="text-sm text-slate-300 mt-2">138{t.legacy_desc}</p>
                     </div>
+                  </div>
+
+                  {/* ===== 時間軸組件 ===== */}
+                  <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
+                      {renderTimeline(retirementTimelineConfig, retirementTimelineCompResult)}
                   </div>
 
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
@@ -2150,6 +2294,47 @@
                         </div>
                     </div>
                 </div>
+
+                {/* ===== 新增：Gemini API 智能分析按鈕與結果區塊 ===== */}
+                <div className="flex flex-col items-center w-full my-6">
+                    <button 
+                        onClick={handleAIAnalysis}
+                        disabled={aiLoading}
+                        className={`group flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all duration-300 w-full md:w-auto ${
+                            aiLoading 
+                            ? "bg-slate-200 text-slate-500 cursor-not-allowed" 
+                            : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 hover:-translate-y-1 hover:shadow-xl"
+                        }`}
+                    >
+                        {aiLoading ? (
+                            <Icon path={icons.RefreshCw} className="w-6 h-6 animate-spin" />
+                        ) : (
+                            <Icon path={icons.Sparkles} className="w-6 h-6 text-yellow-300 group-hover:scale-110 transition-transform" />
+                        )}
+                        {aiLoading ? t.ai_loading : t.ai_btn}
+                    </button>
+
+                    {aiError && (
+                        <div className="mt-4 text-red-500 font-medium bg-red-50 px-4 py-3 rounded-xl border border-red-100 flex items-center gap-2 w-full md:w-auto">
+                            <Icon path={icons.Info} className="w-5 h-5 shrink-0" />
+                            <span>{aiError}</span>
+                        </div>
+                    )}
+
+                    {aiResult && !aiLoading && !aiError && (
+                        <div className="mt-8 w-full bg-white rounded-2xl p-6 sm:p-8 shadow-sm border-2 border-indigo-100 relative overflow-hidden animate-[fadeIn_0.5s_ease-out]">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-0 opacity-50"></div>
+                            <h3 className="text-xl font-extrabold text-indigo-900 mb-6 flex items-center gap-2 border-b border-indigo-50 pb-4 relative z-10">
+                                <Icon path={icons.Sparkles} className="w-6 h-6 text-indigo-600" />
+                                {t.ai_advisor_title}
+                            </h3>
+                            <div className="relative z-10 text-[15px] text-slate-700">
+                                {formatAIText(aiResult)}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                {/* ======================================================= */}
 
                 {/* Timeline Chart Replacement */}
                 <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
