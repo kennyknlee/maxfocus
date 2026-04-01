@@ -4,16 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>盈聚．天下 II 建議書數據儀表板</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- react-is 解決 Recharts 依賴錯誤 -->
     <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
-    <!-- Babel 用於在瀏覽器編譯 JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Recharts 圖表庫 -->
     <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
     <script src="https://unpkg.com/recharts@2.1.9/umd/Recharts.js"></script>
 </head>
@@ -22,17 +17,15 @@
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
-        const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceArea } = window.Recharts;
+        const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceArea, BarChart, Bar, Legend } = window.Recharts;
 
         // --- 語言翻譯字典 ---
         const translations = {
             tc: {
-                // 通用
                 home: "返回主頁",
                 lang_tc: "繁",
                 lang_sc: "简",
                 lang_en: "EN",
-                // 首頁
                 main_title: "盈聚．天下 II 靈活儲蓄計劃",
                 sub_title: "請選擇您的理財方案",
                 feat_title: "盈聚．天下 II 主要功能",
@@ -45,14 +38,14 @@
                 leg_desc: "守護家族財富，將愛與心意世代相傳",
                 anim_title: "傳承方案動畫展示",
                 anim_desc: "更改保單權益人及被保人流程示範",
-                spec_title: "特別方案",
-                spec_desc: "度身訂造的靈活理財選項，配合特殊需求",
-                // 方案共通
+                spec_title: "自訂方案比較",
+                spec_desc: "自訂供款與提取，即時對比不同方案之回報",
                 plan_analysis: "方案分析",
                 cumulative_prem: "累計總供款",
                 est_total_withdraw: "預計總提取資金",
                 est_legacy_value: "預期滾存傳承價值",
-                age_man: "歲",
+                est_total_surrender: "預期總退保價值",
+                age_man: "歲男士",
                 age_kid: "歲幼兒",
                 prem_years: "年供款",
                 withdraw_start: "歲起每年提取",
@@ -89,7 +82,6 @@
                 table_col_sb: "(C)特別紅利",
                 table_col_div: "(D)紅利鎖定",
                 tooltip_age: "被保人年齡",
-                // 教育方案專用
                 edu_subtitle: "預備大學教育基金",
                 edu_accum_years: "為滾存期，總「滾存年期」為",
                 edu_withdraw_desc: "歲至22歲，每年提取",
@@ -100,7 +92,6 @@
                 edu_cancel_account: "可取消戶口，用作",
                 edu_cancel_use: "置業、創業、再進修",
                 edu_cancel_etc: "等等用途",
-                // 傳承方案專用
                 leg_subtitle: "60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案",
                 leg_prem_desc: "極速2年短暫供款期",
                 leg_withdraw_desc: "分別於 83歲, 90歲 及 95歲 大額提取",
@@ -111,7 +102,6 @@
                 leg_tip_2_hl: "結婚安樂窩",
                 leg_tip_3_title: "取之於社會用之於社會，設立",
                 leg_tip_3_hl: "社會基金 ，回饋社會",
-                // 動畫
                 anim_replay: "重新播放",
                 anim_next: "下一步",
                 anim_rewatch: "重新觀看",
@@ -130,17 +120,36 @@
                 anim_step3_title: "財富傳承完成",
                 anim_step3_desc: "第80個保單年度 (Susan 65歲)\nSusan可選擇提取現金作為己用或把保單價值留給子女",
                 anim_step3_pct: "(佔繳付保費總額的14945%)",
-                // 建設中
                 uc_title: "正在建設中",
-                uc_desc: "此方案的數據與內容即將推出，敬請期待。"
+                uc_desc: "此方案的數據與內容即將推出，敬請期待。",
+                // 自訂方案對比專用
+                comp_plan_a: "方案 A",
+                comp_plan_b: "方案 B",
+                comp_basic_set: "基本供款設定 - USD",
+                comp_w_set: "提款設定",
+                comp_m_set: "里程碑 (預期總退保價值)",
+                comp_annual_prem: "每年供款",
+                comp_start_age: "開始年齡",
+                comp_end_age: "完結年齡",
+                comp_annual_w: "每年提取",
+                comp_w_start: "開始提取年齡",
+                comp_w_end: "完結提取年齡",
+                comp_vs_chart: "里程碑退保價值對比圖",
+                comp_table_view: "切換數據表顯示",
+                comp_no_data: "需參考建議書",
+                comp_plan_title: "儲蓄戶口",
+                comp_prem_period: "供款期",
+                comp_accum_period: "收息期",
+                comp_w_period: "提款期",
+                comp_total_prem: "總供款",
+                comp_total_w: "總提款",
+                comp_remain_val: "剩餘戶口價值"
             },
             sc: {
-                // 通用
                 home: "返回主页",
                 lang_tc: "繁",
                 lang_sc: "简",
                 lang_en: "EN",
-                // 首頁
                 main_title: "盈聚．天下 II 灵活储蓄计划",
                 sub_title: "请选择您的理财方案",
                 feat_title: "盈聚．天下 II 主要功能",
@@ -153,14 +162,14 @@
                 leg_desc: "守护家族财富，将爱与心意世代相传",
                 anim_title: "传承方案动画展示",
                 anim_desc: "更改保单权益人及被保人流程示范",
-                spec_title: "特别方案",
-                spec_desc: "量身定制的灵活理财选项，配合特殊需求",
-                // 方案共通
+                spec_title: "自订方案比较",
+                spec_desc: "自订供款与提取，即时对比不同方案之回报",
                 plan_analysis: "方案分析",
                 cumulative_prem: "累计总供款",
                 est_total_withdraw: "预计总提取资金",
                 est_legacy_value: "预期滚存传承价值",
-                age_man: "岁",
+                est_total_surrender: "预期总退保价值",
+                age_man: "岁男士",
                 age_kid: "岁幼儿",
                 prem_years: "年供款",
                 withdraw_start: "岁起每年提取",
@@ -197,7 +206,6 @@
                 table_col_sb: "(C)特别红利",
                 table_col_div: "(D)红利锁定",
                 tooltip_age: "被保人年龄",
-                // 教育方案专用
                 edu_subtitle: "预备大学教育基金",
                 edu_accum_years: "为滚存期，总「滚存年期」为",
                 edu_withdraw_desc: "岁至22岁，每年提取",
@@ -208,7 +216,6 @@
                 edu_cancel_account: "可取消户口，用作",
                 edu_cancel_use: "置业、创业、再进修",
                 edu_cancel_etc: "等等用途",
-                // 传承方案专用
                 leg_subtitle: "60岁高净值人士 | 2年供款 | 财富传承与慈善基金方案",
                 leg_prem_desc: "极速2年短暂供款期",
                 leg_withdraw_desc: "分别于 83岁, 90岁 及 95岁 大额提取",
@@ -219,7 +226,6 @@
                 leg_tip_2_hl: "结婚安乐窝",
                 leg_tip_3_title: "取之于社会用之于社会，设立",
                 leg_tip_3_hl: "社会基金 ，回馈社会",
-                // 动画
                 anim_replay: "重新播放",
                 anim_next: "下一步",
                 anim_rewatch: "重新观看",
@@ -238,17 +244,35 @@
                 anim_step3_title: "财富传承完成",
                 anim_step3_desc: "第80个保单年度 (Susan 65岁)\nSusan可选择提取现金作为己用或把保单价值留给子女",
                 anim_step3_pct: "(占缴付保费总额的14945%)",
-                // 建设中
                 uc_title: "正在建设中",
-                uc_desc: "此方案的数据与内容即将推出，敬请期待。"
+                uc_desc: "此方案的数据与内容即将推出，敬请期待。",
+                comp_plan_a: "方案 A",
+                comp_plan_b: "方案 B",
+                comp_basic_set: "基本供款设定 - USD",
+                comp_w_set: "提款设定",
+                comp_m_set: "里程碑 (预期总退保价值)",
+                comp_annual_prem: "每年供款",
+                comp_start_age: "开始年龄",
+                comp_end_age: "完结年龄",
+                comp_annual_w: "每年提取",
+                comp_w_start: "开始提取年龄",
+                comp_w_end: "完结提取年龄",
+                comp_vs_chart: "里程碑退保价值对比图",
+                comp_table_view: "切换数据表显示",
+                comp_no_data: "需参考建议书",
+                comp_plan_title: "储蓄户口",
+                comp_prem_period: "供款期",
+                comp_accum_period: "收息期",
+                comp_w_period: "提款期",
+                comp_total_prem: "总供款",
+                comp_total_w: "总提款",
+                comp_remain_val: "剩余户口价值"
             },
             en: {
-                // 通用
                 home: "Back to Home",
                 lang_tc: "繁",
                 lang_sc: "简",
                 lang_en: "EN",
-                // 首頁
                 main_title: "Wealth Advance II Savings Plan",
                 sub_title: "Please select your financial plan",
                 feat_title: "Key Features",
@@ -261,13 +285,13 @@
                 leg_desc: "Safeguard family wealth, passing love and legacy across generations",
                 anim_title: "Legacy Plan Animation",
                 anim_desc: "Demonstration of changing the policyholder and insured",
-                spec_title: "Special Plan",
-                spec_desc: "Tailor-made flexible financial options for special needs",
-                // 方案共通
+                spec_title: "Custom Comparison",
+                spec_desc: "Customize premiums and withdrawals to instantly compare returns",
                 plan_analysis: "Plan Analysis",
                 cumulative_prem: "Cumulative Premium",
                 est_total_withdraw: "Est. Total Withdrawal",
                 est_legacy_value: "Est. Legacy Value",
+                est_total_surrender: "Est. Total Surrender Value",
                 age_man: "-yr-old Male",
                 age_kid: "-yr-old Child",
                 prem_years: "-yr premium",
@@ -305,7 +329,6 @@
                 table_col_sb: "(C) Special Bonus",
                 table_col_div: "(D) Bonus Lock-in",
                 tooltip_age: "Insured Age",
-                // 教育方案專用
                 edu_subtitle: "Prepare university education fund",
                 edu_accum_years: " accumulation period, total: ",
                 edu_withdraw_desc: "Age  to 22, withdraw annually ",
@@ -316,7 +339,6 @@
                 edu_cancel_account: "Can cancel account for ",
                 edu_cancel_use: "property, startup, further study",
                 edu_cancel_etc: " etc.",
-                // 傳承方案專用
                 leg_subtitle: "Age 60 HNW Individual | 2-yr Premium | Wealth Legacy & Charity Fund",
                 leg_prem_desc: "Ultra-short 2-year premium payment term",
                 leg_withdraw_desc: "Large withdrawals at age 83, 90, and 95",
@@ -327,7 +349,6 @@
                 leg_tip_2_hl: "a cozy home for marriage",
                 leg_tip_3_title: "Give back to society, establish ",
                 leg_tip_3_hl: "charity fund",
-                // 動畫
                 anim_replay: "Replay",
                 anim_next: "Next Step",
                 anim_rewatch: "Rewatch",
@@ -346,9 +367,29 @@
                 anim_step3_title: "Legacy Completed",
                 anim_step3_desc: "80th Policy Year (Susan Age 65)\nSusan can withdraw cash or leave policy value to her children",
                 anim_step3_pct: "(14945% of Total Premium Paid)",
-                // 建設中
                 uc_title: "Under Construction",
-                uc_desc: "Data and content for this plan are coming soon. Stay tuned."
+                uc_desc: "Data and content for this plan are coming soon. Stay tuned.",
+                comp_plan_a: "Plan A",
+                comp_plan_b: "Plan B",
+                comp_basic_set: "Premium Settings - USD",
+                comp_w_set: "Withdrawal Settings",
+                comp_m_set: "Milestones (Est. Surrender Value)",
+                comp_annual_prem: "Annual Prem",
+                comp_start_age: "Start Age",
+                comp_end_age: "End Age",
+                comp_annual_w: "Annual W/D",
+                comp_w_start: "W/D Start Age",
+                comp_w_end: "W/D End Age",
+                comp_vs_chart: "Milestone Value Comparison",
+                comp_table_view: "Toggle Data Table",
+                comp_no_data: "Ref. Proposal",
+                comp_plan_title: "Savings Account",
+                comp_prem_period: "Payment Period",
+                comp_accum_period: "Accumulation Period",
+                comp_w_period: "Withdrawal Period",
+                comp_total_prem: "Total Prem",
+                comp_total_w: "Total W/D",
+                comp_remain_val: "Remaining Value"
             }
         };
 
@@ -379,9 +420,11 @@
             Target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
             PlayCircle: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
             ChevronRight: '<path d="m9 18 6-6-6-6"/>',
+            ChevronLeft: '<path d="m15 18-6-6 6-6"/>',
             RotateCcw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
             User: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-            Globe: '<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'
+            Globe: '<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+            SettingsSliders: '<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>'
         };
 
         // 1歲教育儲蓄方案數據 (5年供款, 每年 USD 13,000)
@@ -653,6 +696,19 @@
           const [exchangeRate, setExchangeRate] = useState(7.8); 
           const [chartPeriod, setChartPeriod] = useState('active'); 
           const [animationStep, setAnimationStep] = useState(0);
+          
+          // --- 自訂方案比較 狀態 ---
+          const [compTableVisible, setCompTableVisible] = useState(false);
+          const [planA, setPlanA] = useState({
+              premAmount: 8400, premStart: 34, premEnd: 38,
+              wAmount: 20000, wStart: 66, wEnd: 90,
+              wEndSurrender: 168722 // 新增：完結提取時的預期總退保價值
+          });
+          const [planB, setPlanB] = useState({
+              premAmount: 4200, premStart: 34, premEnd: 43,
+              wAmount: 16000, wStart: 66, wEnd: 90,
+              wEndSurrender: 222418 // 新增：完結提取時的預期總退保價值
+          });
 
           // 取得當前語言字典
           const t = translations[language];
@@ -669,6 +725,7 @@
           }, []);
 
           const formatCurrency = (value) => {
+            if(value === '-' || value === undefined) return value;
             const convertedValue = currency === 'HKD' ? value * exchangeRate : value;
             return new Intl.NumberFormat('en-US', {
               style: 'currency',
@@ -712,6 +769,129 @@
               return { ...row, cumulativePrem, cumWithdrawal };
             });
           }, []);
+
+          // --- 自訂比較資料運算 (簡化版) ---
+          const compResultA = useMemo(() => {
+              const premYears = planA.premEnd - planA.premStart + 1;
+              const wYears = planA.wEnd - planA.wStart + 1;
+              return {
+                  totalPrem: Math.max(premYears, 0) * planA.premAmount,
+                  totalW: Math.max(wYears, 0) * planA.wAmount
+              };
+          }, [planA]);
+
+          const compResultB = useMemo(() => {
+              const premYears = planB.premEnd - planB.premStart + 1;
+              const wYears = planB.wEnd - planB.wStart + 1;
+              return {
+                  totalPrem: Math.max(premYears, 0) * planB.premAmount,
+                  totalW: Math.max(wYears, 0) * planB.wAmount
+              };
+          }, [planB]);
+
+          // --- 時間軸圖表組件 ---
+          const renderTimeline = (planConfig, compResult) => {
+              const premYears = planConfig.premEnd - planConfig.premStart + 1;
+              const accumYears = planConfig.wStart - planConfig.premEnd - 1;
+              const wYears = planConfig.wEnd - planConfig.wStart + 1;
+              const totalYears = planConfig.wEnd - planConfig.premStart + 1;
+
+              // 防止因輸入錯誤導致負數或錯誤寬度
+              const safePremPct = Math.max((premYears / totalYears) * 100, 0);
+              const safeAccumPct = Math.max((accumYears / totalYears) * 100, 0);
+              const safeWPct = Math.max((wYears / totalYears) * 100, 0);
+
+              const totalPrem = compResult.totalPrem;
+              const totalW = compResult.totalW;
+              const remainValue = planConfig.wEndSurrender; // 直接讀取設定的退保價值
+              
+              const title = `${t.comp_plan_title}：${premYears}${t.years}`;
+
+              return (
+                  <div className="mb-14">
+                      <div className="bg-slate-100 py-3 px-6 rounded-t-2xl border-b-2 border-slate-200 flex justify-center items-center">
+                          <h3 className="font-bold text-slate-700 text-lg md:text-xl tracking-wide">{title}</h3>
+                      </div>
+                      
+                      <div className="px-6 pb-10 pt-4 bg-white rounded-b-2xl border-x border-b border-slate-100 shadow-sm">
+                          {/* Timeline Bar */}
+                          <div className="w-full relative mt-6 mb-12">
+                              {/* 內部彩條與箭嘴 */}
+                              <div className="flex w-full h-12 rounded-full overflow-hidden shadow-inner border border-slate-200 relative z-10">
+                                  <div style={{width: `${safePremPct}%`}} className="bg-amber-400 flex items-center justify-between text-xs md:text-sm font-bold text-amber-900 px-2 md:px-4">
+                                      <Icon path={icons.ChevronLeft} className="w-4 h-4 opacity-40 shrink-0" />
+                                      <span className="truncate mx-1">{t.comp_prem_period}</span>
+                                      <Icon path={icons.ChevronRight} className="w-4 h-4 opacity-40 shrink-0" />
+                                  </div>
+                                  {safeAccumPct > 0 && (
+                                      <div style={{width: `${safeAccumPct}%`}} className="bg-lime-400 flex items-center justify-between text-xs md:text-sm font-bold text-lime-900 px-2 md:px-4 border-l border-white/50">
+                                          <Icon path={icons.ChevronLeft} className="w-4 h-4 opacity-40 shrink-0" />
+                                          <span className="truncate mx-1">{t.comp_accum_period}</span>
+                                          <Icon path={icons.ChevronRight} className="w-4 h-4 opacity-40 shrink-0" />
+                                      </div>
+                                  )}
+                                  <div style={{width: `${safeWPct}%`}} className="bg-sky-400 flex items-center justify-between text-xs md:text-sm font-bold text-sky-900 px-2 md:px-4 border-l border-white/50">
+                                      <Icon path={icons.ChevronLeft} className="w-4 h-4 opacity-40 shrink-0" />
+                                      <span className="truncate mx-1">{t.comp_w_period}</span>
+                                      <Icon path={icons.ChevronRight} className="w-4 h-4 opacity-40 shrink-0" />
+                                  </div>
+                              </div>
+                              
+                              {/* 紅點與歲數標記 (疊加在彩條外側) */}
+                              <div className="absolute top-[100%] left-0 w-full h-0 z-20">
+                                  {/* Point 1: 供款開始 */}
+                                  <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: '0%' }}>
+                                      <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
+                                      <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.premStart}{language==='en'?'':' 歲'}</span>
+                                  </div>
+                                  {/* Point 2: 供款結束 */}
+                                  <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${safePremPct}%` }}>
+                                      <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
+                                      <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.premEnd}{language==='en'?'':' 歲'}</span>
+                                  </div>
+                                  {/* Point 3: 提取開始 (如果收息期存在) */}
+                                  {safeAccumPct > 0 && (
+                                      <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${safePremPct + safeAccumPct}%` }}>
+                                          <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
+                                          <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.wStart}{language==='en'?'':' 歲'}</span>
+                                      </div>
+                                  )}
+                                  {/* Point 4: 提取結束 */}
+                                  <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: '100%' }}>
+                                      <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
+                                      <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.wEnd}{language==='en'?'':' 歲'}</span>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="flex flex-col md:flex-row justify-between text-sm md:text-base border-t border-slate-100 pt-6 mt-4">
+                              <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-6 md:mb-0 w-full md:w-auto">
+                                  <div className="text-right text-slate-500">{t.comp_prem_period}：</div>
+                                  <div className="font-bold text-slate-800">{premYears}{t.years}</div>
+                                  <div className="text-right text-slate-500">{t.comp_annual_prem}：</div>
+                                  <div className="font-bold text-slate-800">{formatCurrency(planConfig.premAmount)}</div>
+                                  <div className="text-right text-slate-500">{t.comp_total_prem}：</div>
+                                  <div className="font-bold text-slate-800">{formatCurrency(totalPrem)}</div>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-6 md:mb-0 w-full md:w-auto">
+                                  <div className="text-right text-slate-500">{t.comp_w_period}：</div>
+                                  <div className="font-bold text-slate-800">{wYears}{t.years}</div>
+                                  <div className="text-right text-slate-500">{t.comp_annual_w}：</div>
+                                  <div className="font-bold text-slate-800">{formatCurrency(planConfig.wAmount)}</div>
+                                  <div className="text-right text-slate-500">{t.comp_total_w}：</div>
+                                  <div className="font-bold text-slate-800">{formatCurrency(totalW)}</div>
+                              </div>
+
+                              <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-2 mt-2 md:mt-0 w-full md:w-auto bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                  <div className="text-slate-500 font-medium">{t.comp_remain_val}</div>
+                                  <div className="font-extrabold text-2xl text-slate-900">{formatCurrency(remainValue)}</div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              );
+          };
 
           // --- 頂部導航欄 (語言切換) ---
           const TopNav = () => (
@@ -774,9 +954,9 @@
                       <p className="text-slate-500">{t.anim_desc}</p>
                   </div>
                   
-                  <div onClick={() => setCurrentView('special')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
-                      <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 transition-transform">
-                          <Icon path={icons.Target} className="w-8 h-8" />
+                  <div onClick={() => setCurrentView('comparison')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
+                      <div className="w-16 h-16 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.SettingsSliders} className="w-8 h-8" />
                       </div>
                       <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.spec_title}</h3>
                       <p className="text-slate-500">{t.spec_desc}</p>
@@ -804,7 +984,6 @@
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                  {/* 功能 1 */}
                   <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center">
                      <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.TrendingUp} className="w-8 h-8"/>
@@ -835,7 +1014,6 @@
                      </div>
                   </div>
 
-                  {/* 功能 2 */}
                   <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center">
                      <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.Diamond} className="w-8 h-8"/>
@@ -875,7 +1053,6 @@
                      </div>
                   </div>
 
-                  {/* 功能 3 */}
                   <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center mt-4 md:mt-0">
                      <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.ArrowRightLeft} className="w-8 h-8"/>
@@ -915,7 +1092,6 @@
                      </div>
                   </div>
 
-                  {/* 功能 4 */}
                   <div className="group relative bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover:shadow-lg transition-all cursor-help flex flex-col items-center text-center mt-4 md:mt-0">
                      <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-4">
                          <Icon path={icons.ShieldCheck} className="w-8 h-8"/>
@@ -1802,6 +1978,189 @@
             );
           };
 
+          // --- 自訂比較方案視圖 ---
+          const renderComparison = () => {
+             return (
+              <div className="max-w-7xl mx-auto space-y-6">
+                <div className="mb-2">
+                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-cyan-600 transition-colors font-medium">
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
+                    </button>
+                </div>
+                
+                <header className="flex flex-col lg:flex-row items-start lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
+                  <div>
+                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                      <Icon path={icons.SettingsSliders} className="w-8 h-8 text-cyan-600" />
+                      {t.spec_title}
+                    </h1>
+                    <p className="text-slate-500 mt-2 text-lg">
+                      {t.spec_desc}
+                    </p>
+                  </div>
+                  <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
+                    <Icon path={icons.RefreshCw} className={`w-5 h-5 text-blue-500 mr-2 ${currency === 'HKD' ? 'rotate-180' : ''} transition-transform duration-500`} />
+                    <span className="font-medium text-slate-700">
+                      {currency === 'USD' ? 'USD' : 'HKD'}
+                      {currency === 'HKD' && <span className="text-xs ml-1 text-slate-400">({exchangeRate.toFixed(2)})</span>}
+                    </span>
+                  </button>
+                </header>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* 方案 A 設定 */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-t-blue-500 border-x-slate-200 border-b-slate-200 border-x border-b">
+                        <h3 className="text-xl font-bold text-blue-600 mb-6 pb-2 border-b border-slate-100">{t.comp_plan_a} ({planA.premStart - 1}{language==='en'?'': '歲'} | {planA.premEnd - planA.premStart + 1}{t.prem_years})</h3>
+                        
+                        <div className="space-y-6">
+                            <div>
+                                <h4 className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-md inline-block mb-4">{t.comp_basic_set}</h4>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_annual_prem}</label>
+                                        <input type="number" value={planA.premAmount} onChange={(e) => setPlanA({...planA, premAmount: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_start_age}</label>
+                                        <input type="number" value={planA.premStart} onChange={(e) => setPlanA({...planA, premStart: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_end_age}</label>
+                                        <input type="number" value={planA.premEnd} onChange={(e) => setPlanA({...planA, premEnd: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-md inline-block mb-4">{t.comp_w_set}</h4>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_annual_w}</label>
+                                        <input type="number" value={planA.wAmount} onChange={(e) => setPlanA({...planA, wAmount: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_w_start}</label>
+                                        <input type="number" value={planA.wStart} onChange={(e) => setPlanA({...planA, wStart: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_w_end}</label>
+                                        <input type="number" value={planA.wEnd} onChange={(e) => setPlanA({...planA, wEnd: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.est_total_surrender}</label>
+                                        <input type="number" value={planA.wEndSurrender} onChange={(e) => setPlanA({...planA, wEndSurrender: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 方案 B 設定 */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-t-amber-500 border-x-slate-200 border-b-slate-200 border-x border-b">
+                        <h3 className="text-xl font-bold text-amber-600 mb-6 pb-2 border-b border-slate-100">{t.comp_plan_b} ({planB.premStart - 1}{language==='en'?'': '歲'} | {planB.premEnd - planB.premStart + 1}{t.prem_years})</h3>
+                        
+                        <div className="space-y-6">
+                            <div>
+                                <h4 className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-md inline-block mb-4">{t.comp_basic_set}</h4>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_annual_prem}</label>
+                                        <input type="number" value={planB.premAmount} onChange={(e) => setPlanB({...planB, premAmount: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_start_age}</label>
+                                        <input type="number" value={planB.premStart} onChange={(e) => setPlanB({...planB, premStart: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_end_age}</label>
+                                        <input type="number" value={planB.premEnd} onChange={(e) => setPlanB({...planB, premEnd: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 className="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-md inline-block mb-4">{t.comp_w_set}</h4>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_annual_w}</label>
+                                        <input type="number" value={planB.wAmount} onChange={(e) => setPlanB({...planB, wAmount: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_w_start}</label>
+                                        <input type="number" value={planB.wStart} onChange={(e) => setPlanB({...planB, wStart: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.comp_w_end}</label>
+                                        <input type="number" value={planB.wEnd} onChange={(e) => setPlanB({...planB, wEnd: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-slate-500 mb-1">{t.est_total_surrender}</label>
+                                        <input type="number" value={planB.wEndSurrender} onChange={(e) => setPlanB({...planB, wEndSurrender: Number(e.target.value)})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-amber-500 focus:border-amber-500" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Dashboard Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-center items-center text-center">
+                        <span className="font-bold text-sm tracking-wide text-slate-500 mb-3">{t.cumulative_prem}</span>
+                        <div className="flex w-full items-center justify-between px-4">
+                            <div className="text-left">
+                                <p className="text-xs text-blue-500 font-bold">{t.comp_plan_a}</p>
+                                <p className="text-xl font-bold text-slate-900">{formatCurrency(compResultA.totalPrem)}</p>
+                            </div>
+                            <div className="text-slate-300 font-light text-2xl px-2">VS</div>
+                            <div className="text-right">
+                                <p className="text-xs text-amber-500 font-bold">{t.comp_plan_b}</p>
+                                <p className="text-xl font-bold text-slate-900">{formatCurrency(compResultB.totalPrem)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-emerald-50 rounded-2xl p-6 shadow-sm border border-emerald-100 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                        <span className="font-bold text-sm tracking-wide text-emerald-700 mb-3 z-10">{t.est_total_withdraw}</span>
+                        <div className="flex w-full items-center justify-between px-4 z-10">
+                            <div className="text-left">
+                                <p className="text-xs text-blue-600 font-bold">{t.comp_plan_a}</p>
+                                <p className="text-xl font-bold text-emerald-700">{formatCurrency(compResultA.totalW)}</p>
+                            </div>
+                            <div className="text-emerald-300 font-light text-2xl px-2">VS</div>
+                            <div className="text-right">
+                                <p className="text-xs text-amber-600 font-bold">{t.comp_plan_b}</p>
+                                <p className="text-xl font-bold text-emerald-700">{formatCurrency(compResultB.totalW)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-center items-center text-center">
+                        <span className="font-bold text-sm tracking-wide text-slate-300 mb-3">{t.comp_remain_val} ({planA.wEnd}{language==='en'?'':'歲'})</span>
+                        <div className="flex w-full items-center justify-between px-4">
+                            <div className="text-left">
+                                <p className="text-xs text-blue-400 font-bold">{t.comp_plan_a}</p>
+                                <p className="text-xl font-bold text-white">{formatCurrency(planA.wEndSurrender)}</p>
+                            </div>
+                            <div className="text-slate-600 font-light text-2xl px-2">VS</div>
+                            <div className="text-right">
+                                <p className="text-xs text-amber-400 font-bold">{t.comp_plan_b}</p>
+                                <p className="text-xl font-bold text-white">{formatCurrency(planB.wEndSurrender)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Timeline Chart Replacement */}
+                <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
+                    {renderTimeline(planA, compResultA)}
+                    {renderTimeline(planB, compResultB)}
+                </div>
+
+              </div>
+             );
+          };
+
           return (
             <div className="min-h-screen text-slate-800 font-sans bg-slate-50">
               <TopNav />
@@ -1812,7 +2171,7 @@
                 {currentView === 'education' && renderEducation()}
                 {currentView === 'legacy' && renderLegacy()}
                 {currentView === 'legacyAnimation' && renderLegacyAnimation()}
-                {currentView === 'special' && renderPlaceholder(t.spec_title)}
+                {currentView === 'comparison' && renderComparison()}
               </div>
             </div>
           );
