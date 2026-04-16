@@ -4,13 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>盈聚．天下 II 建議書數據儀表板</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- react-is 解決 Recharts 依賴錯誤 -->
     <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
+    <!-- Babel 用於在瀏覽器編譯 JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Recharts 圖表庫 -->
     <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
     <script src="https://unpkg.com/recharts@2.1.9/umd/Recharts.js"></script>
+    <!-- HTML to PDF 庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-slate-50">
     <div id="root"></div>
@@ -95,7 +103,7 @@
                 leg_subtitle: "60歲高淨值人士 | 2年供款 | 財富傳承與慈善基金方案",
                 leg_prem_desc: "極速2年短暫供款期",
                 leg_withdraw_desc: "分別於 83歲, 90歲 及 95歲 大額提取",
-                leg_withdraw_purpose: "傳承家族财富與設立社會基金",
+                leg_withdraw_purpose: "傳承家族財富與設立社會基金",
                 leg_tip_1_title: "送給孫子的愛，",
                 leg_tip_1_hl: "人生第一份創業資金",
                 leg_tip_2_title: "送給孫子的愛，",
@@ -124,7 +132,7 @@
                 uc_desc: "此方案的數據與內容即將推出，敬請期待。",
                 comp_plan_a: "方案 A",
                 comp_plan_b: "方案 B",
-                comp_basic_set: "基本供款設定 - USD",
+                comp_basic_set: "基本供款設定",
                 comp_w_set: "提款設定",
                 comp_m_set: "里程碑 (預期總退保價值)",
                 comp_annual_prem: "每年供款",
@@ -143,10 +151,9 @@
                 comp_total_prem: "總供款",
                 comp_total_w: "總提款",
                 comp_remain_val: "剩餘戶口價值",
-                ai_btn: "✨ AI 智能方案對比",
-                ai_loading: "顧問 AI 正在努力運算與分析您的理財方案中...",
-                ai_error: "抱歉，AI 分析目前無法連線。請稍後再試。",
-                ai_advisor_title: "✨ 您的 AI 專屬理財顧問分析"
+                btn_export_pdf: "匯出 PDF",
+                irr_title: "回報計算器",
+                irr_desc: "專為儲蓄型保險設計的內部回報率分析工具"
             },
             sc: {
                 home: "返回主页",
@@ -251,7 +258,7 @@
                 uc_desc: "此方案的数据与内容即将推出，敬请期待。",
                 comp_plan_a: "方案 A",
                 comp_plan_b: "方案 B",
-                comp_basic_set: "基本供款设定 - USD",
+                comp_basic_set: "基本供款设定",
                 comp_w_set: "提款设定",
                 comp_m_set: "里程碑 (预期总退保价值)",
                 comp_annual_prem: "每年供款",
@@ -270,10 +277,9 @@
                 comp_total_prem: "总供款",
                 comp_total_w: "总提款",
                 comp_remain_val: "剩余户口价值",
-                ai_btn: "✨ AI 智能方案对比",
-                ai_loading: "顾问 AI 正在努力运算与分析您的理财方案中...",
-                ai_error: "抱歉，AI 分析目前无法连线。请稍后再试。",
-                ai_advisor_title: "✨ 您的 AI 专属理财顾问分析"
+                btn_export_pdf: "导出 PDF",
+                irr_title: "回报计算器",
+                irr_desc: "专为储蓄型保险设计的内部回报率分析工具"
             },
             en: {
                 home: "Back to Home",
@@ -378,7 +384,7 @@
                 uc_desc: "Data and content for this plan are coming soon. Stay tuned.",
                 comp_plan_a: "Plan A",
                 comp_plan_b: "Plan B",
-                comp_basic_set: "Premium Settings - USD",
+                comp_basic_set: "Premium Settings",
                 comp_w_set: "Withdrawal Settings",
                 comp_m_set: "Milestones (Est. Surrender Value)",
                 comp_annual_prem: "Annual Prem",
@@ -397,10 +403,9 @@
                 comp_total_prem: "Total Prem",
                 comp_total_w: "Total W/D",
                 comp_remain_val: "Remaining Value",
-                ai_btn: "✨ AI Smart Plan Comparison",
-                ai_loading: "Advisor AI is analyzing your financial plans...",
-                ai_error: "Sorry, AI analysis is currently unavailable. Please try again later.",
-                ai_advisor_title: "✨ Your Exclusive AI Advisor Analysis"
+                btn_export_pdf: "Export PDF",
+                irr_title: "IRR Calculator",
+                irr_desc: "Internal Rate of Return analysis tool for savings plans"
             }
         };
 
@@ -436,7 +441,12 @@
             User: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
             Globe: '<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
             SettingsSliders: '<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/>',
-            Sparkles: '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 3v4"/><path d="M17 5h4"/>'
+            Download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+            Calculator: '<rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>',
+            DollarSign: '<line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+            Copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+            Plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+            Trash2: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>'
         };
 
         // 1歲教育儲蓄方案數據 (5年供款, 每年 USD 13,000)
@@ -708,23 +718,33 @@
           const [exchangeRate, setExchangeRate] = useState(7.8); 
           const [chartPeriod, setChartPeriod] = useState('active'); 
           const [animationStep, setAnimationStep] = useState(0);
-
-          // --- Gemini AI 狀態 ---
-          const [aiLoading, setAiLoading] = useState(false);
-          const [aiResult, setAiResult] = useState(null);
-          const [aiError, setAiError] = useState(null);
+          const [isExporting, setIsExporting] = useState(false); // 新增匯出 PDF 狀態
           
+          // --- IRR 計算器 狀態 ---
+          const [irrPlanName, setIrrPlanName] = useState('盈聚天下II');
+          const [irrPaymentTerm, setIrrPaymentTerm] = useState(3);
+          const [irrFirstYearDiscountRate, setIrrFirstYearDiscountRate] = useState('');
+          const [irrSecondYearDiscountRate, setIrrSecondYearDiscountRate] = useState('');
+          const [irrAnnualPremiums, setIrrAnnualPremiums] = useState(['200,000', '200,000', '200,000']);
+          const [irrIsPrepayment, setIrrIsPrepayment] = useState(false);
+          const [irrPrepaymentInterest, setIrrPrepaymentInterest] = useState('');
+          const [irrWithdrawalOptions, setIrrWithdrawalOptions] = useState([
+            { id: 1, year: '10', accountValue: '845,664', irr: null },
+            { id: 2, year: '15', accountValue: '1,190,469', irr: null },
+            { id: 3, year: '20', accountValue: '1,820,660', irr: null }
+          ]);
+
           // --- 自訂方案比較 狀態 ---
           const [compTableVisible, setCompTableVisible] = useState(false);
           const [planA, setPlanA] = useState({
               premAmount: 8400, premStart: 34, premEnd: 38,
               wAmount: 20000, wStart: 66, wEnd: 90,
-              wEndSurrender: 168722 // 新增：完結提取時的預期總退保價值
+              wEndSurrender: 168722 
           });
           const [planB, setPlanB] = useState({
               premAmount: 4200, premStart: 34, premEnd: 43,
               wAmount: 16000, wStart: 66, wEnd: 90,
-              wEndSurrender: 222418 // 新增：完結提取時的預期總退保價值
+              wEndSurrender: 222418 
           });
 
           // 取得當前語言字典
@@ -741,12 +761,6 @@
               .catch(err => console.log('匯率獲取失敗，使用預設值 7.8'));
           }, []);
 
-          // 清除 AI 分析結果當頁面或數據改變時
-          useEffect(() => {
-            setAiResult(null);
-            setAiError(null);
-          }, [currentView, planA, planB, language, currency]);
-
           const formatCurrency = (value) => {
             if(value === '-' || value === undefined) return value;
             const convertedValue = currency === 'HKD' ? value * exchangeRate : value;
@@ -757,20 +771,154 @@
             }).format(convertedValue);
           };
 
-          // --- IRR 計算機 狀態 ---
-          const [irrPlanName, setIrrPlanName] = useState('盈聚天下II');
-          const [irrPaymentTerm, setIrrPaymentTerm] = useState(3);
-          const [irrFirstYearDiscountRate, setIrrFirstYearDiscountRate] = useState('');
-          const [irrSecondYearDiscountRate, setIrrSecondYearDiscountRate] = useState('');
-          const [irrAnnualPremiums, setIrrAnnualPremiums] = useState(['200,000', '200,000', '200,000']);
-          const [irrIsPrepayment, setIrrIsPrepayment] = useState(false);
-          const [irrPrepaymentInterest, setIrrPrepaymentInterest] = useState('');
-          const [irrWithdrawalOptions, setIrrWithdrawalOptions] = useState([
-            { id: 1, year: '10', accountValue: '845,664', irr: null },
-            { id: 2, year: '15', accountValue: '1,190,469', irr: null },
-            { id: 3, year: '20', accountValue: '1,820,660', irr: null }
-          ]);
+          // --- IRR 計算邏輯 ---
+          const irrParseNum = (val) => {
+            if (!val) return 0;
+            const parsed = parseFloat(String(val).replace(/,/g, ''));
+            return isNaN(parsed) ? 0 : parsed;
+          };
 
+          const formatIrrNumberInput = (val) => {
+            const numericString = val.replace(/[^\d]/g, '');
+            if (!numericString) return '';
+            return parseInt(numericString, 10).toLocaleString('en-US');
+          };
+
+          const handleIrrPaymentTermChange = (e) => {
+            const newTerm = parseInt(e.target.value);
+            setIrrPaymentTerm(newTerm);
+            setIrrAnnualPremiums(prev => {
+              const newArr = [...prev];
+              while (newArr.length < newTerm) newArr.push('');
+              return newArr.slice(0, newTerm);
+            });
+          };
+
+          const copyIrrFirstYearPremium = () => {
+            if (!irrAnnualPremiums[0]) return;
+            setIrrAnnualPremiums(prev => prev.map(() => prev[0]));
+          };
+
+          const getIrrActualPremium = (baseVal, yearIndex) => {
+            const base = irrParseNum(baseVal);
+            if (yearIndex === 0 && irrFirstYearDiscountRate) {
+              return base * (1 - irrParseNum(irrFirstYearDiscountRate) / 100);
+            }
+            if (yearIndex === 1 && irrSecondYearDiscountRate) {
+              return base * (1 - irrParseNum(irrSecondYearDiscountRate) / 100);
+            }
+            return base;
+          };
+
+          const computeIrrValue = (cashFlows) => {
+            const maxIterations = 1000;
+            const precision = 1e-7;
+
+            const runNewtonRaphson = (guess) => {
+              for (let i = 0; i < maxIterations; i++) {
+                let npv = 0;
+                let derivativeNpv = 0;
+                for (let t = 0; t < cashFlows.length; t++) {
+                  const denominator = Math.pow(1 + guess, t);
+                  npv += cashFlows[t] / denominator;
+                  if (t > 0) {
+                    derivativeNpv -= (t * cashFlows[t]) / Math.pow(1 + guess, t + 1);
+                  }
+                }
+                if (derivativeNpv === 0) return null;
+                const newGuess = guess - npv / derivativeNpv;
+                if (Math.abs(newGuess - guess) < precision) {
+                  return newGuess;
+                }
+                guess = newGuess;
+              }
+              return null;
+            };
+
+            const guesses = [0.05, 0.1, 0.0, -0.05, 0.2, -0.2];
+            for (let g of guesses) {
+              let res = runNewtonRaphson(g);
+              if (res !== null && !isNaN(res) && res > -1) {
+                return res;
+              }
+            }
+            return null;
+          };
+
+          const handleIrrCalculate = () => {
+            const newOptions = irrWithdrawalOptions.map(opt => {
+              const tYear = parseInt(opt.year);
+              const accValue = irrParseNum(opt.accountValue);
+              
+              if (isNaN(tYear) || tYear <= 0 || accValue <= 0) return { ...opt, irr: null };
+
+              const cf = new Array(tYear + 1).fill(0);
+              
+              if (irrIsPrepayment) {
+                for (let i = 0; i < irrPaymentTerm; i++) {
+                  if (i <= tYear) {
+                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
+                  }
+                }
+                cf[tYear] += accValue + irrParseNum(irrPrepaymentInterest);
+              } else {
+                for (let i = 0; i < irrPaymentTerm; i++) {
+                  if (i <= tYear) {
+                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
+                  }
+                }
+                cf[tYear] += accValue;
+              }
+
+              const hasPositive = cf.some(val => val > 0);
+              const hasNegative = cf.some(val => val < 0);
+              
+              if (!hasPositive || !hasNegative) {
+                return { ...opt, irr: '無法計算' };
+              }
+
+              const irrVal = computeIrrValue(cf);
+              return { ...opt, irr: irrVal !== null ? (irrVal * 100).toFixed(2) : '錯誤' };
+            });
+            
+            setIrrWithdrawalOptions(newOptions);
+          };
+
+          // --- 匯出 PDF 功能 ---
+          const handleExportPDF = () => {
+              setIsExporting(true); // 設定為匯出中，用以隱藏匯出按鈕避免被截圖
+              
+              // 給 React 渲染畫面（隱藏按鈕）的時間
+              setTimeout(() => {
+                  const element = document.getElementById('capture-area');
+                  if (!element) {
+                      setIsExporting(false);
+                      return;
+                  }
+
+                  window.html2canvas(element, {
+                      scale: 2, // 提高解析度
+                      useCORS: true,
+                      backgroundColor: '#f8fafc' // 對齊 tailwind 的 bg-slate-50
+                  }).then((canvas) => {
+                      const imgData = canvas.toDataURL('image/png');
+                      
+                      // 建立 PDF 實例，依據 Canvas 自動設定長寬
+                      const pdf = new window.jspdf.jsPDF({
+                          orientation: canvas.width > canvas.height ? 'l' : 'p',
+                          unit: 'px',
+                          format: [canvas.width, canvas.height]
+                      });
+                      
+                      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                      pdf.save(`FWD_Plan_${currentView}.pdf`);
+                      setIsExporting(false);
+                  }).catch(err => {
+                      console.error('PDF export failed:', err);
+                      setIsExporting(false);
+                  });
+              }, 100); 
+          };
 
           // --- 數據處理 ---
           const currentRetirementData = activeTab === '30' ? data30 
@@ -827,122 +975,6 @@
               };
           }, [planB]);
 
-          // ===== 修復 React #310 錯誤：將 renderRetirement 內的 useMemo 提升到此處 =====
-          const retirementTimelineConfig = useMemo(() => {
-              const configs = {
-                  '30': { premStart: 31, premEnd: 35, wStart: 61, wEnd: 95, premAmount: 13000, wAmount: 27000 },
-                  '40': { premStart: 41, premEnd: 45, wStart: 66, wEnd: 95, premAmount: 13000, wAmount: 20000 },
-                  '50': { premStart: 51, premEnd: 55, wStart: 71, wEnd: 95, premAmount: 13000, wAmount: 16000 },
-                  '55': { premStart: 56, premEnd: 60, wStart: 71, wEnd: 90, premAmount: 13000, wAmount: 12000 }
-              };
-              const conf = { ...configs[activeTab] };
-              
-              // 尋找提款完結年齡時的剩餘戶口價值
-              const wEndData = processedRetirementData.find(d => d.age === conf.wEnd);
-              conf.wEndSurrender = wEndData ? wEndData.total : 0;
-              
-              return conf;
-          }, [activeTab, processedRetirementData]);
-
-          const retirementTimelineCompResult = useMemo(() => {
-              return {
-                  totalPrem: (retirementTimelineConfig.premEnd - retirementTimelineConfig.premStart + 1) * retirementTimelineConfig.premAmount,
-                  totalW: (retirementTimelineConfig.wEnd - retirementTimelineConfig.wStart + 1) * retirementTimelineConfig.wAmount
-              };
-          }, [retirementTimelineConfig]);
-          // ===============================================================================
-
-          // --- Gemini AI API 呼叫 ---
-          const handleAIAnalysis = async () => {
-              setAiLoading(true);
-              setAiError(null);
-              setAiResult(null);
-
-              const apiKey = ""; // API Key injected at runtime
-              const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-              const requestedLanguage = language === 'en' ? 'English' : language === 'tc' ? 'Traditional Chinese (zh-HK)' : 'Simplified Chinese (zh-CN)';
-              
-              const prompt = `As a professional financial advisor, analyze and compare these two custom setups for the "Wealth Advance II Savings Plan". Provide your response in ${requestedLanguage}.
-              
-              Plan A (方案 A): 
-              - Contribution: ${planA.premEnd - planA.premStart + 1} years, ${formatCurrency(planA.premAmount)} annually. Total Contribution: ${formatCurrency(compResultA.totalPrem)}.
-              - Withdrawal: ${planA.wEnd - planA.wStart + 1} years, ${formatCurrency(planA.wAmount)} annually. Total Withdrawn: ${formatCurrency(compResultA.totalW)}.
-              - Remaining Account Value at age ${planA.wEnd}: ${formatCurrency(planA.wEndSurrender)}.
-              
-              Plan B (方案 B):
-              - Contribution: ${planB.premEnd - planB.premStart + 1} years, ${formatCurrency(planB.premAmount)} annually. Total Contribution: ${formatCurrency(compResultB.totalPrem)}.
-              - Withdrawal: ${planB.wEnd - planB.wStart + 1} years, ${formatCurrency(planB.wAmount)} annually. Total Withdrawn: ${formatCurrency(compResultB.totalW)}.
-              - Remaining Account Value at age ${planB.wEnd}: ${formatCurrency(planB.wEndSurrender)}.
-
-              Please provide:
-              1. A brief summary of the differences.
-              2. Which plan is better for short-term liquidity vs. long-term wealth accumulation.
-              3. A professional recommendation on how to choose between them based on different life goals.
-              Use simple bullet points and a friendly, supportive tone. Do not use overly complex markdown, just bold text and bullet points.`;
-
-              let retries = 0;
-              const maxRetries = 5;
-              const delays = [1000, 2000, 4000, 8000, 16000];
-
-              while (retries <= maxRetries) {
-                  try {
-                      const response = await fetch(url, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                              contents: [{ parts: [{ text: prompt }] }],
-                              systemInstruction: { parts: [{ text: "You are a professional, helpful, and concise financial advisor AI. Use simple formatting." }] }
-                          })
-                      });
-
-                      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                      const data = await response.json();
-                      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                      
-                      if (text) {
-                          setAiResult(text);
-                          setAiLoading(false);
-                          return;
-                      } else {
-                          throw new Error("No response from AI");
-                      }
-                  } catch (error) {
-                      if (retries === maxRetries) {
-                          console.error("AI Error:", error);
-                          setAiError(t.ai_error);
-                          setAiLoading(false);
-                          return;
-                      }
-                      await new Promise(res => setTimeout(res, delays[retries]));
-                      retries++;
-                  }
-              }
-          };
-
-          // --- 格式化 Markdown 文本為簡單的 HTML ---
-          const formatAIText = (text) => {
-              if (!text) return null;
-              // 簡單處理換行和粗體
-              const paragraphs = text.split('\n');
-              return paragraphs.map((para, index) => {
-                  if (para.trim() === '') return <br key={index} />;
-                  
-                  // 處理粗體 **text**
-                  const parts = para.split(/(\*\*.*?\*\*)/g);
-                  return (
-                      <p key={index} className="mb-2 text-slate-700 leading-relaxed">
-                          {parts.map((part, i) => {
-                              if (part.startsWith('**') && part.endsWith('**')) {
-                                  return <strong key={i} className="text-slate-900">{part.slice(2, -2)}</strong>;
-                              }
-                              return part;
-                          })}
-                      </p>
-                  );
-              });
-          };
-
           // --- 時間軸圖表組件 ---
           const renderTimeline = (planConfig, compResult) => {
               const premYears = planConfig.premEnd - planConfig.premStart + 1;
@@ -950,14 +982,13 @@
               const wYears = planConfig.wEnd - planConfig.wStart + 1;
               const totalYears = planConfig.wEnd - planConfig.premStart + 1;
 
-              // 防止因輸入錯誤導致負數或錯誤寬度
               const safePremPct = Math.max((premYears / totalYears) * 100, 0);
               const safeAccumPct = Math.max((accumYears / totalYears) * 100, 0);
               const safeWPct = Math.max((wYears / totalYears) * 100, 0);
 
               const totalPrem = compResult.totalPrem;
               const totalW = compResult.totalW;
-              const remainValue = planConfig.wEndSurrender; // 直接讀取設定的退保價值
+              const remainValue = planConfig.wEndSurrender; 
               
               const title = `${t.comp_plan_title}：${premYears}${t.years}`;
 
@@ -968,9 +999,7 @@
                       </div>
                       
                       <div className="px-6 pb-10 pt-4 bg-white rounded-b-2xl border-x border-b border-slate-100 shadow-sm">
-                          {/* Timeline Bar */}
                           <div className="w-full relative mt-6 mb-12">
-                              {/* 內部彩條與箭嘴 */}
                               <div className="flex w-full h-12 rounded-full overflow-hidden shadow-inner border border-slate-200 relative z-10">
                                   <div style={{width: `${safePremPct}%`}} className="bg-amber-400 flex items-center justify-between text-xs md:text-sm font-bold text-amber-900 px-2 md:px-4">
                                       <Icon path={icons.ChevronLeft} className="w-4 h-4 opacity-40 shrink-0" />
@@ -991,26 +1020,21 @@
                                   </div>
                               </div>
                               
-                              {/* 紅點與歲數標記 (疊加在彩條外側) */}
                               <div className="absolute top-[100%] left-0 w-full h-0 z-20">
-                                  {/* Point 1: 供款開始 */}
                                   <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: '0%' }}>
                                       <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
                                       <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.premStart}{language==='en'?'':' 歲'}</span>
                                   </div>
-                                  {/* Point 2: 供款結束 */}
                                   <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${safePremPct}%` }}>
                                       <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
                                       <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.premEnd}{language==='en'?'':' 歲'}</span>
                                   </div>
-                                  {/* Point 3: 提取開始 (如果收息期存在) */}
                                   {safeAccumPct > 0 && (
                                       <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${safePremPct + safeAccumPct}%` }}>
                                           <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
                                           <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.wStart}{language==='en'?'':' 歲'}</span>
                                       </div>
                                   )}
-                                  {/* Point 4: 提取結束 */}
                                   <div className="absolute top-0 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: '100%' }}>
                                       <div className="w-3.5 h-3.5 bg-red-500 rounded-full ring-4 ring-white shadow-sm"></div>
                                       <span className="mt-2 text-xs md:text-sm font-bold text-slate-500 whitespace-nowrap bg-white px-1">{planConfig.wEnd}{language==='en'?'':' 歲'}</span>
@@ -1108,7 +1132,7 @@
                       <p className="text-slate-500">{t.anim_desc}</p>
                   </div>
                   
-                  <div onClick={() => setCurrentView('comparison')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
+                  <div onClick={() => setCurrentView('comparison')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
                       <div className="w-16 h-16 bg-cyan-50 rounded-2xl flex items-center justify-center text-cyan-600 mb-6 group-hover:scale-110 transition-transform">
                           <Icon path={icons.SettingsSliders} className="w-8 h-8" />
                       </div>
@@ -1116,14 +1140,13 @@
                       <p className="text-slate-500">{t.spec_desc}</p>
                   </div>
 
-                  <div onClick={() => setCurrentView('irr')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
+                  <div onClick={() => setCurrentView('irr')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group">
                       <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform">
-                          <Icon path={icons.Activity} className="w-8 h-8" />
+                          <Icon path={icons.Calculator} className="w-8 h-8" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-2">回報計算器</h3>
-                      <p className="text-slate-500">計算保單內部回報率 (IRR)</p>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.irr_title}</h3>
+                      <p className="text-slate-500">{t.irr_desc}</p>
                   </div>
-
               </div>
             </div>
           );
@@ -1321,6 +1344,23 @@
             const totalWithdrawn = processedRetirementData[processedRetirementData.length - 1].cumWithdrawal;
             const finalValue = processedRetirementData[processedRetirementData.length - 1].total;
 
+            const wStartAge = parseInt(currentDetails.withdrawAge.split('歲')[0]);
+            const wEndAge = parseInt(currentDetails.withdrawAge.split('至')[1].replace('歲',''));
+            const retPlanConfig = {
+                premAmount: 13000,
+                premStart: parseInt(activeTab) + 1,
+                premEnd: parseInt(activeTab) + 5,
+                wAmount: currentDetails.withdrawalAmount,
+                wStart: wStartAge,
+                wEnd: wEndAge,
+                wEndSurrender: processedRetirementData.find(d => d.age === wEndAge)?.total ?? '-'
+            };
+            const retCompResult = {
+                totalPrem: totalPremium,
+                totalW: totalWithdrawn,
+                data: processedRetirementData
+            };
+
             const chartData = chartPeriod === 'active' 
               ? processedRetirementData.filter(d => d.age <= 95)
               : chartPeriod === 'legacy' ? processedRetirementData.filter(d => d.age >= 95) : processedRetirementData;
@@ -1407,9 +1447,9 @@
                     </div>
                   </div>
 
-                  {/* ===== 時間軸組件 ===== */}
+                  {/* 新增: 退休方案動態時間軸 */}
                   <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
-                      {renderTimeline(retirementTimelineConfig, retirementTimelineCompResult)}
+                      {renderTimeline(retPlanConfig, retCompResult)}
                   </div>
 
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
@@ -2319,47 +2359,6 @@
                     </div>
                 </div>
 
-                {/* ===== 新增：Gemini API 智能分析按鈕與結果區塊 ===== */}
-                <div className="flex flex-col items-center w-full my-6">
-                    <button 
-                        onClick={handleAIAnalysis}
-                        disabled={aiLoading}
-                        className={`group flex items-center justify-center gap-3 px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all duration-300 w-full md:w-auto ${
-                            aiLoading 
-                            ? "bg-slate-200 text-slate-500 cursor-not-allowed" 
-                            : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 hover:-translate-y-1 hover:shadow-xl"
-                        }`}
-                    >
-                        {aiLoading ? (
-                            <Icon path={icons.RefreshCw} className="w-6 h-6 animate-spin" />
-                        ) : (
-                            <Icon path={icons.Sparkles} className="w-6 h-6 text-yellow-300 group-hover:scale-110 transition-transform" />
-                        )}
-                        {aiLoading ? t.ai_loading : t.ai_btn}
-                    </button>
-
-                    {aiError && (
-                        <div className="mt-4 text-red-500 font-medium bg-red-50 px-4 py-3 rounded-xl border border-red-100 flex items-center gap-2 w-full md:w-auto">
-                            <Icon path={icons.Info} className="w-5 h-5 shrink-0" />
-                            <span>{aiError}</span>
-                        </div>
-                    )}
-
-                    {aiResult && !aiLoading && !aiError && (
-                        <div className="mt-8 w-full bg-white rounded-2xl p-6 sm:p-8 shadow-sm border-2 border-indigo-100 relative overflow-hidden animate-[fadeIn_0.5s_ease-out]">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -z-0 opacity-50"></div>
-                            <h3 className="text-xl font-extrabold text-indigo-900 mb-6 flex items-center gap-2 border-b border-indigo-50 pb-4 relative z-10">
-                                <Icon path={icons.Sparkles} className="w-6 h-6 text-indigo-600" />
-                                {t.ai_advisor_title}
-                            </h3>
-                            <div className="relative z-10 text-[15px] text-slate-700">
-                                {formatAIText(aiResult)}
-                            </div>
-                        </div>
-                    )}
-                </div>
-                {/* ======================================================= */}
-
                 {/* Timeline Chart Replacement */}
                 <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
                     {renderTimeline(planA, compResultA)}
@@ -2370,153 +2369,30 @@
              );
           };
 
+          // --- IRR 回報計算器視圖 ---
+          const renderIRR = () => {
+            const totalPremiumAmount = irrAnnualPremiums.reduce((sum, val, idx) => sum + getIrrActualPremium(val, idx), 0);
 
-         // ============================================================================
-          // --- IRR 計算機 專用圖示與邏輯 (完全還原 irrv3.html) ---
-          // ============================================================================
-          const IconIrrCalculator = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>;
-          const IconIrrSettings = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
-          const IconIrrDollarSign = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
-          const IconIrrCopy = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
-          const IconIrrInfo = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
-          const IconIrrArrowRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
-          const IconIrrPlus = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
-          const IconIrrTrash2 = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>;
-
-          const parseIrrNum = (val) => {
-            if (!val) return 0;
-            const parsed = parseFloat(String(val).replace(/,/g, ''));
-            return isNaN(parsed) ? 0 : parsed;
-          };
-
-          const formatIrrNumberInput = (val) => {
-            const numericString = val.replace(/[^\d]/g, '');
-            if (!numericString) return '';
-            return parseInt(numericString, 10).toLocaleString('en-US');
-          };
-
-          const handleIrrPaymentTermChange = (e) => {
-            const newTerm = parseInt(e.target.value);
-            setIrrPaymentTerm(newTerm);
-            setIrrAnnualPremiums(prev => {
-              const newArr = [...prev];
-              while (newArr.length < newTerm) newArr.push('');
-              return newArr.slice(0, newTerm);
-            });
-          };
-
-          const copyIrrFirstYearPremium = () => {
-            if (!irrAnnualPremiums[0]) return;
-            setIrrAnnualPremiums(prev => prev.map(() => prev[0]));
-          };
-
-          const getIrrActualPremium = (baseVal, yearIndex) => {
-            const base = parseIrrNum(baseVal);
-            if (yearIndex === 0 && irrFirstYearDiscountRate) {
-              return base * (1 - parseIrrNum(irrFirstYearDiscountRate) / 100);
-            }
-            if (yearIndex === 1 && irrSecondYearDiscountRate) {
-              return base * (1 - parseIrrNum(irrSecondYearDiscountRate) / 100);
-            }
-            return base;
-          };
-
-          const computeExactIRR = (cashFlows) => {
-            const maxIterations = 1000;
-            const precision = 1e-7;
-
-            const runNewtonRaphson = (guess) => {
-              for (let i = 0; i < maxIterations; i++) {
-                let npv = 0;
-                let derivativeNpv = 0;
-                for (let t = 0; t < cashFlows.length; t++) {
-                  const denominator = Math.pow(1 + guess, t);
-                  npv += cashFlows[t] / denominator;
-                  if (t > 0) {
-                    derivativeNpv -= (t * cashFlows[t]) / Math.pow(1 + guess, t + 1);
-                  }
-                }
-                if (derivativeNpv === 0) return null;
-                const newGuess = guess - npv / derivativeNpv;
-                if (Math.abs(newGuess - guess) < precision) {
-                  return newGuess;
-                }
-                guess = newGuess;
-              }
-              return null;
-            };
-
-            const guesses = [0.05, 0.1, 0.0, -0.05, 0.2, -0.2];
-            for (let g of guesses) {
-              let res = runNewtonRaphson(g);
-              if (res !== null && !isNaN(res) && res > -1) {
-                return res;
-              }
-            }
-            return null;
-          };
-
-          const executeIrrCalculate = () => {
-            const newOptions = irrWithdrawalOptions.map(opt => {
-              const tYear = parseInt(opt.year);
-              const accValue = parseIrrNum(opt.accountValue);
-              
-              if (isNaN(tYear) || tYear <= 0 || accValue <= 0) return { ...opt, irr: null };
-
-              const cf = new Array(tYear + 1).fill(0);
-              
-              if (irrIsPrepayment) {
-                for (let i = 0; i < irrPaymentTerm; i++) {
-                  if (i <= tYear) {
-                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
-                  }
-                }
-                cf[tYear] += accValue + parseIrrNum(irrPrepaymentInterest);
-              } else {
-                for (let i = 0; i < irrPaymentTerm; i++) {
-                  if (i <= tYear) {
-                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
-                  }
-                }
-                cf[tYear] += accValue;
-              }
-
-              const hasPositive = cf.some(val => val > 0);
-              const hasNegative = cf.some(val => val < 0);
-              
-              if (!hasPositive || !hasNegative) {
-                return { ...opt, irr: '無法計算' };
-              }
-
-              const irrVal = computeExactIRR(cf);
-              return { ...opt, irr: irrVal !== null ? (irrVal * 100).toFixed(2) : '錯誤' };
-            });
-            
-            setIrrWithdrawalOptions(newOptions);
-          };
-
-          const totalIrrPremiumAmount = irrAnnualPremiums.reduce((sum, val, idx) => sum + getIrrActualPremium(val, idx), 0);
-
-          const renderIrr = () => {
-             return (
-              <div className="max-w-3xl mx-auto space-y-6 pb-24 text-gray-800">
+            return (
+              <div className="max-w-3xl mx-auto space-y-6">
                 <div className="mb-2">
-                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
-                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-indigo-600 transition-colors font-medium">
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> {t.home}
                     </button>
                 </div>
-
+                
                 <header className="flex items-center gap-3 bg-blue-700 text-white p-5 rounded-2xl shadow-lg">
-                  <IconIrrCalculator className="w-8 h-8" />
+                  <Icon path={icons.Calculator} className="w-8 h-8" />
                   <div>
                     <h1 className="text-2xl font-bold tracking-wide">保險產品 IRR 計算機</h1>
                     <p className="text-blue-100 text-sm mt-1">專為儲蓄型保險設計的內部回報率分析工具</p>
                   </div>
                 </header>
 
+                {/* 1. 計劃與供款設定 */}
                 <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                   <div className="flex items-center gap-2 mb-4 text-blue-800 border-b pb-3">
-                    <IconIrrSettings className="w-5 h-5" />
+                    <Icon path={icons.SettingsSliders} className="w-5 h-5" />
                     <h2 className="font-semibold text-lg">1. 計劃與供款設定</h2>
                   </div>
                   
@@ -2561,14 +2437,14 @@
                         <label className="text-sm font-medium text-gray-700">每年供款金額 (USD)</label>
                         {irrPaymentTerm > 1 && (
                           <button onClick={copyIrrFirstYearPremium} className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
-                            <IconIrrCopy className="w-3 h-3" /> 同步首年供款
+                            <Icon path={icons.Copy} className="w-3 h-3" /> 同步首年供款
                           </button>
                         )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {irrAnnualPremiums.map((prem, idx) => {
                           const actual = getIrrActualPremium(prem, idx);
-                          const hasDiscount = actual !== parseIrrNum(prem);
+                          const hasDiscount = actual !== irrParseNum(prem);
                           return (
                             <div key={idx} className={`flex flex-col gap-1 p-2.5 border rounded-lg transition-colors ${hasDiscount ? 'bg-green-50 border-green-300' : 'bg-white border-gray-200'}`}>
                               <div className="flex items-center gap-2">
@@ -2595,17 +2471,18 @@
                       <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
                         <span className="text-sm font-medium text-gray-700">總供款額 (USD)</span>
                         <span className="text-lg font-bold text-blue-700">
-                          ${totalIrrPremiumAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                          ${totalPremiumAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
                   </div>
                 </section>
 
+                {/* 2. 預繳設定 */}
                 <section className={`p-5 rounded-2xl shadow-sm border transition-colors ${irrIsPrepayment ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100'}`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2 text-blue-800">
-                      <IconIrrDollarSign className="w-5 h-5" />
+                      <Icon path={icons.DollarSign} className="w-5 h-5" />
                       <h2 className="font-semibold text-lg">2. 預繳設定 (Prepayment)</h2>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -2615,7 +2492,7 @@
                   </div>
                   
                   <p className="text-xs text-gray-500 mb-4 flex items-start gap-1">
-                    <IconIrrInfo className="w-4 h-4 shrink-0 text-blue-500" />
+                    <Icon path={icons.Info} className="w-4 h-4 shrink-0 text-blue-500" />
                     啟用預繳代表客戶於首年一次過支付所有總保費。
                   </p>
 
@@ -2630,16 +2507,17 @@
                   )}
                 </section>
 
+                {/* 3. 預期回報與 IRR 結果 */}
                 <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-4 border-b pb-3 border-gray-100">
+                  <div className="flex items-center justify-between mb-4 border-b pb-3">
                     <div className="flex items-center gap-2 text-blue-800">
-                      <IconIrrArrowRight className="w-5 h-5" />
+                      <Icon path={icons.ChevronRight} className="w-5 h-5" />
                       <h2 className="font-semibold text-lg">3. 預期回報與 IRR 結果</h2>
                     </div>
                     <button 
                       onClick={() => setIrrWithdrawalOptions([...irrWithdrawalOptions, { id: Date.now(), year: '', accountValue: '', irr: null }])}
                       className="text-sm bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
-                      <IconIrrPlus className="w-4 h-4" /> 新增年份
+                      <Icon path={icons.Plus} className="w-4 h-4" /> 新增年份
                     </button>
                   </div>
 
@@ -2652,7 +2530,7 @@
                             const newOpts = [...irrWithdrawalOptions];
                             newOpts[index].year = e.target.value;
                             setIrrWithdrawalOptions(newOpts);
-                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Yr" />
+                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="年" />
                         </div>
                         
                         <div className="flex-1">
@@ -2661,7 +2539,7 @@
                             const newOpts = [...irrWithdrawalOptions];
                             newOpts[index].accountValue = formatIrrNumberInput(e.target.value);
                             setIrrWithdrawalOptions(newOpts);
-                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Value" />
+                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="價值" />
                         </div>
 
                         <div className="w-20 sm:w-24 shrink-0 text-center bg-blue-50 border border-blue-100 rounded flex flex-col justify-center h-[60px] mt-4 relative">
@@ -2676,25 +2554,25 @@
                             setIrrWithdrawalOptions(irrWithdrawalOptions.filter(item => item.id !== opt.id));
                           }
                         }} className="mt-4 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                          <IconIrrTrash2 className="w-5 h-5" />
+                          <Icon path={icons.Trash2} className="w-5 h-5" />
                         </button>
                       </div>
                     ))}
                   </div>
 
-                  <button onClick={executeIrrCalculate}
+                  <button onClick={handleIrrCalculate}
                     className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2 text-lg active:scale-95">
-                    <IconIrrCalculator className="w-6 h-6" />
+                    <Icon path={icons.Calculator} className="w-6 h-6" />
                     立即計算 {irrPlanName} IRR
                   </button>
                 </section>
+                
               </div>
-             );
+            );
           };
 
-
           return (
-            <div className="min-h-screen text-slate-800 font-sans bg-slate-50">
+            <div id="capture-area" className="min-h-screen text-slate-800 font-sans bg-slate-50 relative">
               <TopNav />
               <div className="p-4 sm:p-8">
                 {currentView === 'home' && renderHome()}
@@ -2704,11 +2582,22 @@
                 {currentView === 'legacy' && renderLegacy()}
                 {currentView === 'legacyAnimation' && renderLegacyAnimation()}
                 {currentView === 'comparison' && renderComparison()}
-                {currentView === 'irr' && renderIrr()} {/* <--- 確保這行有加進去 ---> */}
+                {currentView === 'irr' && renderIRR()}
               </div>
+
+              {/* 匯出 PDF 按鈕 */}
+              {!isExporting && (
+                  <button 
+                      onClick={handleExportPDF}
+                      className="fixed bottom-8 right-8 bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 z-50 transition-transform hover:-translate-y-1 print:hidden"
+                  >
+                      <Icon path={icons.Download} className="w-5 h-5" />
+                      {t.btn_export_pdf}
+                  </button>
+              )}
             </div>
           );
-        } // App() 結束
+        }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
