@@ -757,6 +757,21 @@
             }).format(convertedValue);
           };
 
+          // --- IRR 計算機 狀態 ---
+          const [irrPlanName, setIrrPlanName] = useState('盈聚天下II');
+          const [irrPaymentTerm, setIrrPaymentTerm] = useState(3);
+          const [irrFirstYearDiscountRate, setIrrFirstYearDiscountRate] = useState('');
+          const [irrSecondYearDiscountRate, setIrrSecondYearDiscountRate] = useState('');
+          const [irrAnnualPremiums, setIrrAnnualPremiums] = useState(['200,000', '200,000', '200,000']);
+          const [irrIsPrepayment, setIrrIsPrepayment] = useState(false);
+          const [irrPrepaymentInterest, setIrrPrepaymentInterest] = useState('');
+          const [irrWithdrawalOptions, setIrrWithdrawalOptions] = useState([
+            { id: 1, year: '10', accountValue: '845,664', irr: null },
+            { id: 2, year: '15', accountValue: '1,190,469', irr: null },
+            { id: 3, year: '20', accountValue: '1,820,660', irr: null }
+          ]);
+
+
           // --- 數據處理 ---
           const currentRetirementData = activeTab === '30' ? data30 
                                       : activeTab === '40' ? data40 
@@ -1100,6 +1115,15 @@
                       <h3 className="text-2xl font-bold text-slate-900 mb-2">{t.spec_title}</h3>
                       <p className="text-slate-500">{t.spec_desc}</p>
                   </div>
+
+                  <div onClick={() => setCurrentView('irr')} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center group sm:col-span-2">
+                      <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform">
+                          <Icon path={icons.Activity} className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-2">回報計算器</h3>
+                      <p className="text-slate-500">計算保單內部回報率 (IRR)</p>
+                  </div>
+
               </div>
             </div>
           );
@@ -2346,6 +2370,329 @@
              );
           };
 
+
+         // ============================================================================
+          // --- IRR 計算機 專用圖示與邏輯 (完全還原 irrv3.html) ---
+          // ============================================================================
+          const IconIrrCalculator = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>;
+          const IconIrrSettings = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+          const IconIrrDollarSign = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
+          const IconIrrCopy = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>;
+          const IconIrrInfo = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
+          const IconIrrArrowRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
+          const IconIrrPlus = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
+          const IconIrrTrash2 = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>;
+
+          const parseIrrNum = (val) => {
+            if (!val) return 0;
+            const parsed = parseFloat(String(val).replace(/,/g, ''));
+            return isNaN(parsed) ? 0 : parsed;
+          };
+
+          const formatIrrNumberInput = (val) => {
+            const numericString = val.replace(/[^\d]/g, '');
+            if (!numericString) return '';
+            return parseInt(numericString, 10).toLocaleString('en-US');
+          };
+
+          const handleIrrPaymentTermChange = (e) => {
+            const newTerm = parseInt(e.target.value);
+            setIrrPaymentTerm(newTerm);
+            setIrrAnnualPremiums(prev => {
+              const newArr = [...prev];
+              while (newArr.length < newTerm) newArr.push('');
+              return newArr.slice(0, newTerm);
+            });
+          };
+
+          const copyIrrFirstYearPremium = () => {
+            if (!irrAnnualPremiums[0]) return;
+            setIrrAnnualPremiums(prev => prev.map(() => prev[0]));
+          };
+
+          const getIrrActualPremium = (baseVal, yearIndex) => {
+            const base = parseIrrNum(baseVal);
+            if (yearIndex === 0 && irrFirstYearDiscountRate) {
+              return base * (1 - parseIrrNum(irrFirstYearDiscountRate) / 100);
+            }
+            if (yearIndex === 1 && irrSecondYearDiscountRate) {
+              return base * (1 - parseIrrNum(irrSecondYearDiscountRate) / 100);
+            }
+            return base;
+          };
+
+          const computeExactIRR = (cashFlows) => {
+            const maxIterations = 1000;
+            const precision = 1e-7;
+
+            const runNewtonRaphson = (guess) => {
+              for (let i = 0; i < maxIterations; i++) {
+                let npv = 0;
+                let derivativeNpv = 0;
+                for (let t = 0; t < cashFlows.length; t++) {
+                  const denominator = Math.pow(1 + guess, t);
+                  npv += cashFlows[t] / denominator;
+                  if (t > 0) {
+                    derivativeNpv -= (t * cashFlows[t]) / Math.pow(1 + guess, t + 1);
+                  }
+                }
+                if (derivativeNpv === 0) return null;
+                const newGuess = guess - npv / derivativeNpv;
+                if (Math.abs(newGuess - guess) < precision) {
+                  return newGuess;
+                }
+                guess = newGuess;
+              }
+              return null;
+            };
+
+            const guesses = [0.05, 0.1, 0.0, -0.05, 0.2, -0.2];
+            for (let g of guesses) {
+              let res = runNewtonRaphson(g);
+              if (res !== null && !isNaN(res) && res > -1) {
+                return res;
+              }
+            }
+            return null;
+          };
+
+          const executeIrrCalculate = () => {
+            const newOptions = irrWithdrawalOptions.map(opt => {
+              const tYear = parseInt(opt.year);
+              const accValue = parseIrrNum(opt.accountValue);
+              
+              if (isNaN(tYear) || tYear <= 0 || accValue <= 0) return { ...opt, irr: null };
+
+              const cf = new Array(tYear + 1).fill(0);
+              
+              if (irrIsPrepayment) {
+                for (let i = 0; i < irrPaymentTerm; i++) {
+                  if (i <= tYear) {
+                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
+                  }
+                }
+                cf[tYear] += accValue + parseIrrNum(irrPrepaymentInterest);
+              } else {
+                for (let i = 0; i < irrPaymentTerm; i++) {
+                  if (i <= tYear) {
+                    cf[i] -= getIrrActualPremium(irrAnnualPremiums[i], i); 
+                  }
+                }
+                cf[tYear] += accValue;
+              }
+
+              const hasPositive = cf.some(val => val > 0);
+              const hasNegative = cf.some(val => val < 0);
+              
+              if (!hasPositive || !hasNegative) {
+                return { ...opt, irr: '無法計算' };
+              }
+
+              const irrVal = computeExactIRR(cf);
+              return { ...opt, irr: irrVal !== null ? (irrVal * 100).toFixed(2) : '錯誤' };
+            });
+            
+            setIrrWithdrawalOptions(newOptions);
+          };
+
+          const totalIrrPremiumAmount = irrAnnualPremiums.reduce((sum, val, idx) => sum + getIrrActualPremium(val, idx), 0);
+
+          const renderIrr = () => {
+             return (
+              <div className="max-w-3xl mx-auto space-y-6 pb-24 text-gray-800">
+                <div className="mb-2">
+                    <button onClick={() => setCurrentView('home')} className="flex items-center text-slate-500 hover:text-blue-600 transition-colors font-medium">
+                        <Icon path={icons.ArrowLeft} className="w-5 h-5 mr-2" /> 返回主頁
+                    </button>
+                </div>
+
+                <header className="flex items-center gap-3 bg-blue-700 text-white p-5 rounded-2xl shadow-lg">
+                  <IconIrrCalculator className="w-8 h-8" />
+                  <div>
+                    <h1 className="text-2xl font-bold tracking-wide">保險產品 IRR 計算機</h1>
+                    <p className="text-blue-100 text-sm mt-1">專為儲蓄型保險設計的內部回報率分析工具</p>
+                  </div>
+                </header>
+
+                <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-4 text-blue-800 border-b pb-3">
+                    <IconIrrSettings className="w-5 h-5" />
+                    <h2 className="font-semibold text-lg">1. 計劃與供款設定</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">計劃名稱</label>
+                      <input type="text" value={irrPlanName} onChange={(e) => setIrrPlanName(e.target.value)}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">供款年期</label>
+                        <select value={irrPaymentTerm} onChange={handleIrrPaymentTermChange}
+                          className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                          {[1, 2, 3, 5, 10].map(yr => (
+                            <option key={yr} value={yr}>{yr} 年</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">首年折扣 (%)</label>
+                        <div className="relative">
+                          <input type="number" value={irrFirstYearDiscountRate} onChange={(e) => setIrrFirstYearDiscountRate(e.target.value)}
+                            className="w-full p-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                          <span className="absolute right-3 top-2.5 text-gray-400">%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">第二年折扣 (%)</label>
+                        <div className="relative">
+                          <input type="number" value={irrSecondYearDiscountRate} onChange={(e) => setIrrSecondYearDiscountRate(e.target.value)}
+                            className="w-full p-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+                            disabled={irrPaymentTerm < 2} />
+                          <span className="absolute right-3 top-2.5 text-gray-400">%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 mt-2">
+                      <div className="flex justify-between items-center mb-3">
+                        <label className="text-sm font-medium text-gray-700">每年供款金額 (USD)</label>
+                        {irrPaymentTerm > 1 && (
+                          <button onClick={copyIrrFirstYearPremium} className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded">
+                            <IconIrrCopy className="w-3 h-3" /> 同步首年供款
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {irrAnnualPremiums.map((prem, idx) => {
+                          const actual = getIrrActualPremium(prem, idx);
+                          const hasDiscount = actual !== parseIrrNum(prem);
+                          return (
+                            <div key={idx} className={`flex flex-col gap-1 p-2.5 border rounded-lg transition-colors ${hasDiscount ? 'bg-green-50 border-green-300' : 'bg-white border-gray-200'}`}>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-500 w-12 shrink-0">Year {idx + 1}</span>
+                                <input type="text" value={prem}
+                                  onChange={(e) => {
+                                    const newArr = [...irrAnnualPremiums];
+                                    newArr[idx] = formatIrrNumberInput(e.target.value);
+                                    setIrrAnnualPremiums(newArr);
+                                  }}
+                                  className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none bg-white"
+                                />
+                              </div>
+                              {hasDiscount && (
+                                <div className="text-right text-xs text-green-700 font-semibold pr-1">
+                                  實際繳付: ${actual.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      <div className="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+                        <span className="text-sm font-medium text-gray-700">總供款額 (USD)</span>
+                        <span className="text-lg font-bold text-blue-700">
+                          ${totalIrrPremiumAmount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className={`p-5 rounded-2xl shadow-sm border transition-colors ${irrIsPrepayment ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100'}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-blue-800">
+                      <IconIrrDollarSign className="w-5 h-5" />
+                      <h2 className="font-semibold text-lg">2. 預繳設定 (Prepayment)</h2>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" checked={irrIsPrepayment} onChange={() => setIrrIsPrepayment(!irrIsPrepayment)} />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 mb-4 flex items-start gap-1">
+                    <IconIrrInfo className="w-4 h-4 shrink-0 text-blue-500" />
+                    啟用預繳代表客戶於首年一次過支付所有總保費。
+                  </p>
+
+                  {irrIsPrepayment && (
+                    <div className="mt-4 bg-white p-3 rounded-lg border border-blue-100 shadow-inner">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">期滿預繳保證利息 (USD)</label>
+                      <input type="text" value={irrPrepaymentInterest} 
+                        onChange={(e) => setIrrPrepaymentInterest(formatIrrNumberInput(e.target.value))}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="輸入保證利息總額..." />
+                    </div>
+                  )}
+                </section>
+
+                <section className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4 border-b pb-3 border-gray-100">
+                    <div className="flex items-center gap-2 text-blue-800">
+                      <IconIrrArrowRight className="w-5 h-5" />
+                      <h2 className="font-semibold text-lg">3. 預期回報與 IRR 結果</h2>
+                    </div>
+                    <button 
+                      onClick={() => setIrrWithdrawalOptions([...irrWithdrawalOptions, { id: Date.now(), year: '', accountValue: '', irr: null }])}
+                      className="text-sm bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                      <IconIrrPlus className="w-4 h-4" /> 新增年份
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {irrWithdrawalOptions.map((opt, index) => (
+                      <div key={opt.id} className="flex items-center gap-2 bg-gray-50 p-2 sm:p-3 rounded-xl border border-gray-100">
+                        <div className="w-20 shrink-0">
+                          <label className="block text-xs text-gray-500 mb-1">目標年份</label>
+                          <input type="number" value={opt.year} onChange={(e) => {
+                            const newOpts = [...irrWithdrawalOptions];
+                            newOpts[index].year = e.target.value;
+                            setIrrWithdrawalOptions(newOpts);
+                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Yr" />
+                        </div>
+                        
+                        <div className="flex-1">
+                          <label className="block text-xs text-gray-500 mb-1">戶口價值 (USD)</label>
+                          <input type="text" value={opt.accountValue} onChange={(e) => {
+                            const newOpts = [...irrWithdrawalOptions];
+                            newOpts[index].accountValue = formatIrrNumberInput(e.target.value);
+                            setIrrWithdrawalOptions(newOpts);
+                          }} className="w-full p-2 border border-gray-300 rounded outline-none focus:border-blue-500" placeholder="Value" />
+                        </div>
+
+                        <div className="w-20 sm:w-24 shrink-0 text-center bg-blue-50 border border-blue-100 rounded flex flex-col justify-center h-[60px] mt-4 relative">
+                          <span className="text-[10px] text-blue-500 absolute top-1 left-0 w-full text-center font-semibold">IRR</span>
+                          <span className="font-bold text-blue-700 text-sm sm:text-base mt-2">
+                            {opt.irr !== null ? `${opt.irr}%` : '--'}
+                          </span>
+                        </div>
+
+                        <button onClick={() => {
+                          if (irrWithdrawalOptions.length > 1) {
+                            setIrrWithdrawalOptions(irrWithdrawalOptions.filter(item => item.id !== opt.id));
+                          }
+                        }} className="mt-4 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                          <IconIrrTrash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button onClick={executeIrrCalculate}
+                    className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center gap-2 text-lg active:scale-95">
+                    <IconIrrCalculator className="w-6 h-6" />
+                    立即計算 {irrPlanName} IRR
+                  </button>
+                </section>
+              </div>
+             );
+          };
+
+
           return (
             <div className="min-h-screen text-slate-800 font-sans bg-slate-50">
               <TopNav />
@@ -2357,10 +2704,11 @@
                 {currentView === 'legacy' && renderLegacy()}
                 {currentView === 'legacyAnimation' && renderLegacyAnimation()}
                 {currentView === 'comparison' && renderComparison()}
+                {currentView === 'irr' && renderIrr()} {/* <--- 確保這行有加進去 ---> */}
               </div>
             </div>
           );
-        }
+        } // App() 結束
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
