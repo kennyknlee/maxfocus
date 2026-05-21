@@ -27,7 +27,7 @@
         const { useState, useMemo, useEffect } = React;
         const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip: RechartsTooltip, ResponsiveContainer, ComposedChart, Line, ReferenceArea, BarChart, Bar, Legend } = window.Recharts;
 
-        // --- 語言翻譯字典 ---
+// --- 語言翻譯字典 ---
         const translations = {
             tc: {
                 home: "返回主頁",
@@ -41,7 +41,7 @@
                 ret_title: "退休方案",
                 ret_desc: "規劃理想退休生活，尊享穩健現金流",
                 edu_title: "教育儲蓄方案",
-                edu_desc: "為子女準備充裕教育基金，築夢未來",
+                edu_desc: "為子女準備充裕教育/創業基金，築夢未來",
                 leg_title: "傳承方案",
                 leg_desc: "守護家族財富，將愛與心意世代相傳",
                 anim_title: "傳承方案動畫展示",
@@ -90,7 +90,7 @@
                 table_col_sb: "(C)特別紅利",
                 table_col_div: "(D)紅利鎖定",
                 tooltip_age: "被保人年齡",
-                edu_subtitle: "預備大學教育基金",
+                edu_subtitle: "預備大學教育/創業基金",
                 edu_accum_years: "為滾存期，總「滾存年期」為",
                 edu_withdraw_desc: "歲至22歲，每年提取",
                 edu_tuition: "作大學學費",
@@ -153,7 +153,17 @@
                 comp_remain_val: "剩餘戶口價值",
                 btn_export_pdf: "匯出 PDF",
                 irr_title: "回報計算器",
-                irr_desc: "專為儲蓄型保險設計的內部回報率分析工具"
+                irr_desc: "專為儲蓄型保險設計的內部回報率分析工具",
+                summary_title: "方案重點總結",
+                ret_summary_1: "短年期供款：只需短短 5 年供款，即可及早為退休生活建立穩健的財務基礎。",
+                ret_summary_2: "穩定被動收入：達到退休年齡後，可透過每年定期提取保單價值，自製長糧。",
+                ret_summary_3: "財富持續增值：提取後剩餘的保單價值將繼續在戶口內滾存，享受複息效應抵禦通脹。",
+                edu_summary_1: "及早預備：趁幼兒 1 歲時啟動 5 年供款，輕鬆為子女提早儲備充裕的教育/創業基金。",
+                edu_summary_2: "精準提取：於子女 19 至 22 歲就讀大學的黃金期，每年提取指定金額以支付學費及生活費 或任可時候提取也可以彈性運用。",
+                edu_summary_3: "靈活運用：畢業後若無需提取，保單可繼續滾存，隨時轉換為未來的置業、創業或婚嫁基金。",
+                leg_summary_1: "極速配置：極速 2 年短暫供款期，適合高淨值人士靈活調配資金，快速啟動財富傳承。",
+                leg_summary_2: "大額提款：可於特定里程碑年齡（如 83、90、95 歲）作大額提取，設立家族信託或回饋社會。",
+                leg_summary_3: "無限傳承：支援無限次更改被保人及保單分拆，配合保單暫託人服務，讓財富穩妥地跨越世代。"
             },
             sc: {
                 home: "返回主页",
@@ -167,7 +177,7 @@
                 ret_title: "退休方案",
                 ret_desc: "规划理想退休生活，尊享稳健现金流",
                 edu_title: "教育储蓄方案",
-                edu_desc: "为子女准备充裕教育基金，筑梦未来",
+                edu_desc: "为子女准备充裕教育/创业基金，筑梦未来",
                 leg_title: "传承方案",
                 leg_desc: "守护家族财富，将爱与心意世代相传",
                 anim_title: "传承方案动画展示",
@@ -216,7 +226,7 @@
                 table_col_sb: "(C)特别红利",
                 table_col_div: "(D)红利锁定",
                 tooltip_age: "被保人年龄",
-                edu_subtitle: "预备大学教育基金",
+                edu_subtitle: "预备大学教育/创业基金",
                 edu_accum_years: "为滚存期，总「滚存年期」为",
                 edu_withdraw_desc: "岁至22岁，每年提取",
                 edu_tuition: "作大学学费",
@@ -279,7 +289,17 @@
                 comp_remain_val: "剩余户口价值",
                 btn_export_pdf: "导出 PDF",
                 irr_title: "回报计算器",
-                irr_desc: "专为储蓄型保险设计的内部回报率分析工具"
+                irr_desc: "专为储蓄型保险设计的内部回报率分析工具",
+                summary_title: "方案重点总结",
+                ret_summary_1: "短年期供款：只需短短 5 年供款，即可及早为退休生活建立稳健的财务基础。",
+                ret_summary_2: "稳定被动收入：达到退休年龄后，可透过每年定期提取保单价值，自制长粮。",
+                ret_summary_3: "财富持续增值：提取后剩余的保单价值将继续在户口内滚存，享受复息效应抵御通胀。",
+                edu_summary_1: "及早预备：趁幼儿 1 岁时启动 5 年供款，轻松为子女提早储备充裕的教育/创业基金。",
+                edu_summary_2: "精准提取：于子女 19 至 22 岁就读大学的黄金期，每年提取指定金额以支付学费及生活费 或任可时候提取也可以弹性运用。",
+                edu_summary_3: "灵活运用：毕业后若无需提取，保单可继续滚存，随时转换为未来的置业、创业或婚嫁基金。",
+                leg_summary_1: "极速配置：极速 2 年短暂供款期，适合高净值人士灵活调配资金，快速启动财富传承。",
+                leg_summary_2: "大额提款：可于特定里程碑年龄（如 83、90、95 岁）作大额提取，设立家族信托或回馈社会。",
+                leg_summary_3: "无限传承：支援无限次更改被保人及保单分拆，配合保单暂托人服务，让财富稳妥地跨越世代。"
             },
             en: {
                 home: "Back to Home",
@@ -405,7 +425,17 @@
                 comp_remain_val: "Remaining Value",
                 btn_export_pdf: "Export PDF",
                 irr_title: "IRR Calculator",
-                irr_desc: "Internal Rate of Return analysis tool for savings plans"
+                irr_desc: "Internal Rate of Return analysis tool for savings plans",
+                summary_title: "Plan Summary & Highlights",
+                ret_summary_1: "Short Premium Term: Just 5 years of premium payments to build a solid financial foundation for retirement early on.",
+                ret_summary_2: "Steady Passive Income: Upon reaching retirement age, enjoy regular annual withdrawals to create a stable passive income stream.",
+                ret_summary_3: "Continuous Wealth Growth: The remaining policy value continues to accumulate with compound interest to combat inflation.",
+                edu_summary_1: "Early Planning: Start a 5-year premium plan at age 1 to easily prepare an ample education fund for your child.",
+                edu_summary_2: "Targeted Withdrawals: Withdraw specified amounts annually during the university years (ages 19-22) to cover tuition and living expenses.",
+                edu_summary_3: "Flexible Usage: If no further withdrawals are needed after graduation, the policy can continue to grow for future property, startup, or wedding funds.",
+                leg_summary_1: "Swift Allocation: An ultra-short 2-year premium term, ideal for high-net-worth individuals to flexibly allocate funds and quickly initiate wealth legacy.",
+                leg_summary_2: "Large Withdrawals: Make significant withdrawals at milestone ages (e.g., 83, 90, 95) to establish family trusts or give back to society.",
+                leg_summary_3: "Infinite Legacy: Supports unlimited changes of the insured, policy splitting, and a Policy Custodian service, ensuring wealth smoothly transitions across generations."
             }
         };
 
@@ -888,7 +918,7 @@
           const handleExportPDF = () => {
               setIsExporting(true); // 設定為匯出中，用以隱藏匯出按鈕避免被截圖
               
-              // 給 React 渲染畫面（隱藏按鈕）的時間
+              // 給 React 渲染畫面（隱藏按鈕、展開表格）的時間
               setTimeout(() => {
                   const element = document.getElementById('capture-area');
                   if (!element) {
@@ -897,20 +927,38 @@
                   }
 
                   window.html2canvas(element, {
-                      scale: 2, // 提高解析度
+                      scale: 2, // 保持高解析度，確保文字清晰
                       useCORS: true,
-                      backgroundColor: '#f8fafc' // 對齊 tailwind 的 bg-slate-50
+                      backgroundColor: '#f8fafc'
                   }).then((canvas) => {
-                      const imgData = canvas.toDataURL('image/png');
+                      // 1. 改用 JPEG 格式並設定品質為 0.95，可大幅減少檔案 MB 大小
+                      const imgData = canvas.toDataURL('image/jpeg', 0.95);
                       
-                      // 建立 PDF 實例，依據 Canvas 自動設定長寬
-                      const pdf = new window.jspdf.jsPDF({
-                          orientation: canvas.width > canvas.height ? 'l' : 'p',
-                          unit: 'px',
-                          format: [canvas.width, canvas.height]
-                      });
+                      // 2. 建立標準 A4 尺寸的 PDF (直向 portrait, 單位 pt, 格式 a4)
+                      const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
                       
-                      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                      // 取得 A4 頁面的寬度與高度
+                      const pdfWidth = pdf.internal.pageSize.getWidth();
+                      const pdfHeight = pdf.internal.pageSize.getHeight();
+                      
+                      // 3. 計算圖片在 PDF 中的高度 (等比例縮放)
+                      const imgHeightInPdf = (canvas.height * pdfWidth) / canvas.width;
+                      
+                      let heightLeft = imgHeightInPdf; // 紀錄還有多少圖片高度還沒貼上
+                      let position = 0; // 紀錄圖片 Y 軸的起始位置
+
+                      // 貼上第一頁
+                      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf);
+                      heightLeft -= pdfHeight;
+
+                      // 4. 如果圖片高度大於一頁 A4，就跑迴圈繼續新增分頁
+                      while (heightLeft > 0) {
+                          position -= pdfHeight; // 把圖片位置往上移一頁的高度
+                          pdf.addPage();         // 新增一頁 A4
+                          pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf);
+                          heightLeft -= pdfHeight;
+                      }
+
                       pdf.save(`FWD_Plan_${currentView}.pdf`);
                       setIsExporting(false);
                   }).catch(err => {
@@ -1511,8 +1559,10 @@
                         {showDetails ? t.hide_details : t.show_details} (A)+(B)+(C)+(D)
                       </button>
                     </div>
+
+                            
                     
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                    <div className={`overflow-x-auto ${isExporting ? '' : 'max-h-[500px] overflow-y-auto'}`}>
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
@@ -1560,6 +1610,28 @@
                       </table>
                     </div>
                   </div>
+                {/* 退休方案重點總結框框 */}
+                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 mt-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-0 opacity-50"></div>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 relative z-10">
+                        <Icon path={icons.Target} className="w-6 h-6 text-blue-600" />
+                        {t.summary_title}
+                    </h3>
+                    <ul className="space-y-4 relative z-10">
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.ret_summary_1}</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.ret_summary_2}</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.ret_summary_3}</span>
+                        </li>
+                    </ul>
+                </div>
               </div>
             );
           };
@@ -1744,7 +1816,7 @@
                       </button>
                     </div>
                     
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto pb-8">
+                    <div className={`overflow-x-auto pb-8 ${isExporting ? '' : 'max-h-[500px] overflow-y-auto'}`}>
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
@@ -1827,6 +1899,28 @@
                       </table>
                     </div>
                   </div>
+              {/* 教育方案重點總結框框 */}
+              <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 mt-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -z-0 opacity-50"></div>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 relative z-10">
+                      <Icon path={icons.GraduationCap} className="w-6 h-6 text-emerald-600" />
+                      {t.summary_title}
+                  </h3>
+                  <ul className="space-y-4 relative z-10">
+                      <li className="flex items-start gap-3">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></div>
+                          <span className="text-slate-600 font-medium leading-relaxed">{t.edu_summary_1}</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></div>
+                          <span className="text-slate-600 font-medium leading-relaxed">{t.edu_summary_2}</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></div>
+                          <span className="text-slate-600 font-medium leading-relaxed">{t.edu_summary_3}</span>
+                      </li>
+                  </ul>
+              </div>
               </div>
             );
           };
@@ -1971,7 +2065,7 @@
                       </button>
                     </div>
                     
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto pb-8">
+                    <div className={`overflow-x-auto pb-8 ${isExporting ? '' : 'max-h-[500px] overflow-y-auto'}`}>
                       <table className="w-full text-left text-sm whitespace-nowrap relative">
                         <thead className="bg-slate-50 text-slate-600 sticky top-0 z-20 shadow-sm">
                           <tr>
@@ -2038,6 +2132,28 @@
                       </table>
                     </div>
                   </div>
+                  {/* 傳承方案重點總結框框 */}
+                <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 mt-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-bl-full -z-0 opacity-50"></div>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 relative z-10">
+                        <Icon path={icons.Diamond} className="w-6 h-6 text-amber-600" />
+                        {t.summary_title}
+                    </h3>
+                    <ul className="space-y-4 relative z-10">
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.leg_summary_1}</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.leg_summary_2}</span>
+                        </li>
+                        <li className="flex items-start gap-3">
+                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0"></div>
+                            <span className="text-slate-600 font-medium leading-relaxed">{t.leg_summary_3}</span>
+                        </li>
+                    </ul>
+                </div>
               </div>
             );
           };
