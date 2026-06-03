@@ -4,19 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>盈聚．天下 II 建議書數據儀表板</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- react-is 解決 Recharts 依賴錯誤 -->
     <script crossorigin src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
-    <!-- Babel 用於在瀏覽器編譯 JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Recharts 圖表庫 -->
     <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
     <script src="https://unpkg.com/recharts@2.1.9/umd/Recharts.js"></script>
-    <!-- HTML to PDF 庫 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -155,7 +149,7 @@
                 irr_title: "回報計算器",
                 irr_desc: "專為儲蓄型保險設計的內部回報率分析工具",
                 summary_title: "方案重點總結",
-                ret_summary_1: "短年期供款：只需短短 5 年供款，即可及早為退休生活建立穩健的財務基礎。",
+                ret_summary_1: "短年期供款：只需短短 5 年或 3 年供款，即可及早為退休生活建立穩健的財務基礎。",
                 ret_summary_2: "穩定被動收入：達到退休年齡後，可透過每年定期提取保單價值，自製長糧。",
                 ret_summary_3: "財富持續增值：提取後剩餘的保單價值將繼續在戶口內滾存，享受複息效應抵禦通脹。",
                 edu_summary_1: "及早預備：趁幼兒 1 歲時啟動 5 年供款，輕鬆為子女提早儲備充裕的教育/創業基金。",
@@ -291,7 +285,7 @@
                 irr_title: "回报计算器",
                 irr_desc: "专为储蓄型保险设计的内部回报率分析工具",
                 summary_title: "方案重点总结",
-                ret_summary_1: "短年期供款：只需短短 5 年供款，即可及早为退休生活建立稳健的财务基础。",
+                ret_summary_1: "短年期供款：只需短短 5 年或 3 年供款，即可及早为退休生活建立稳健的财务基础。",
                 ret_summary_2: "稳定被动收入：达到退休年龄后，可透过每年定期提取保单价值，自制长粮。",
                 ret_summary_3: "财富持续增值：提取后剩余的保单价值将继续在户口内滚存，享受复息效应抵御通胀。",
                 edu_summary_1: "及早预备：趁幼儿 1 岁时启动 5 年供款，轻松为子女提早储备充裕的教育/创业基金。",
@@ -427,7 +421,7 @@
                 irr_title: "IRR Calculator",
                 irr_desc: "Internal Rate of Return analysis tool for savings plans",
                 summary_title: "Plan Summary & Highlights",
-                ret_summary_1: "Short Premium Term: Just 5 years of premium payments to build a solid financial foundation for retirement early on.",
+                ret_summary_1: "Short Premium Term: Just 5 or 3 years of premium payments to build a solid financial foundation for retirement early on.",
                 ret_summary_2: "Steady Passive Income: Upon reaching retirement age, enjoy regular annual withdrawals to create a stable passive income stream.",
                 ret_summary_3: "Continuous Wealth Growth: The remaining policy value continues to accumulate with compound interest to combat inflation.",
                 edu_summary_1: "Early Planning: Start a 5-year premium plan at age 1 to easily prepare an ample education fund for your child.",
@@ -452,7 +446,7 @@
             ArrowRightLeft: '<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>',
             TrendingUp: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
             Coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
-            Eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+            Eye: '<path d="M2 12s3-7 10-7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
             EyeOff: '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
             RefreshCw: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
             Activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
@@ -614,7 +608,7 @@
             { age: 138, prem: 0, w: 0, a: 13081, b: 11839, c: 1620842, d: 0, total: 1645764 }
         ];
 
-        // 50歲退休數據
+        // 50歲退休數據 (5年供款)
         const data50 = [
             { age: 51, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
             { age: 52, prem: 13000, w: 0, a: 0, b: 312, c: 0, d: 0, total: 312 },
@@ -658,6 +652,47 @@
             { age: 138, prem: 0, w: 0, a: 10378, b: 9856, c: 527748, d: 0, total: 547984 }
         ];
 
+        // 50歲退休數據 (3年供款) - 從 PDF 萃取
+        const data50_3pay = [
+            { age: 51, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 52, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 53, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 54, prem: 0, w: 0, a: 18501, b: 3210, c: 49338, d: 0, total: 71049 },
+            { age: 55, prem: 0, w: 0, a: 33642, b: 6446, c: 49529, d: 0, total: 89618 },
+            { age: 56, prem: 0, w: 0, a: 55911, b: 9707, c: 49720, d: 0, total: 115339 },
+            { age: 60, prem: 0, w: 0, a: 78651, b: 23018, c: 59924, d: 0, total: 161593 },
+            { age: 65, prem: 0, w: 0, a: 101687, b: 40263, c: 85529, d: 0, total: 227480 },
+            { age: 70, prem: 0, w: 0, a: 115306, b: 58210, c: 174384, d: 0, total: 347900 },
+            { age: 71, prem: 0, w: 33000, a: 115720, b: 28886, c: 191925, d: 0, total: 336532 },
+            { age: 72, prem: 0, w: 33000, a: 115935, b: 0, c: 210295, d: 0, total: 326230 },
+            { age: 73, prem: 0, w: 33000, a: 106556, b: 0, c: 215046, d: 0, total: 321603 },
+            { age: 74, prem: 0, w: 33000, a: 97768, b: 0, c: 219107, d: 0, total: 316875 },
+            { age: 75, prem: 0, w: 33000, a: 89547, b: 0, c: 222512, d: 0, total: 312059 },
+            { age: 76, prem: 0, w: 33000, a: 81872, b: 0, c: 225346, d: 0, total: 307219 },
+            { age: 77, prem: 0, w: 33000, a: 74719, b: 0, c: 227519, d: 0, total: 302239 },
+            { age: 78, prem: 0, w: 33000, a: 68290, b: 0, c: 227797, d: 0, total: 296088 },
+            { age: 79, prem: 0, w: 33000, a: 62207, b: 0, c: 220126, d: 0, total: 282333 },
+            { age: 80, prem: 0, w: 33000, a: 56377, b: 0, c: 211308, d: 0, total: 267685 },
+            { age: 81, prem: 0, w: 33000, a: 50749, b: 0, c: 201335, d: 0, total: 252085 },
+            { age: 82, prem: 0, w: 33000, a: 45438, b: 0, c: 190032, d: 0, total: 235470 },
+            { age: 83, prem: 0, w: 33000, a: 40425, b: 0, c: 177350, d: 0, total: 217776 },
+            { age: 84, prem: 0, w: 33000, a: 35694, b: 0, c: 163236, d: 0, total: 198931 },
+            { age: 85, prem: 0, w: 33000, a: 31230, b: 0, c: 147631, d: 0, total: 178862 },
+            { age: 86, prem: 0, w: 33000, a: 27014, b: 0, c: 130474, d: 0, total: 157488 },
+            { age: 87, prem: 0, w: 33000, a: 23037, b: 0, c: 111687, d: 0, total: 134724 },
+            { age: 88, prem: 0, w: 33000, a: 19283, b: 0, c: 91198, d: 0, total: 110482 },
+            { age: 89, prem: 0, w: 33000, a: 15739, b: 0, c: 68923, d: 0, total: 84663 },
+            { age: 90, prem: 0, w: 33000, a: 12393, b: 0, c: 44773, d: 0, total: 57166 },
+            { age: 91, prem: 0, w: 0, a: 12437, b: 316, c: 48128, d: 0, total: 60882 },
+            { age: 95, prem: 0, w: 0, a: 12622, b: 1608, c: 64091, d: 0, total: 78323 },
+            { age: 96, prem: 0, w: 0, a: 12671, b: 1938, c: 68804, d: 0, total: 83414 },
+            { age: 100, prem: 0, w: 0, a: 12875, b: 3283, c: 91150, d: 0, total: 107309 },
+            { age: 110, prem: 0, w: 0, a: 13315, b: 6838, c: 181279, d: 0, total: 201434 },
+            { age: 120, prem: 0, w: 0, a: 13803, b: 10689, c: 353626, d: 0, total: 378120 },
+            { age: 130, prem: 0, w: 0, a: 14344, b: 14859, c: 680579, d: 0, total: 709783 },
+            { age: 138, prem: 0, w: 0, a: 14817, b: 18442, c: 1141428, d: 0, total: 1174688 }
+        ];
+
         // 55歲退休數據
         const data55 = [
             { age: 56, prem: 13000, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
@@ -696,6 +731,54 @@
             { age: 120, prem: 0, w: 0, a: 12821, b: 8849, c: 345402, d: 0, total: 367074 },
             { age: 130, prem: 0, w: 0, a: 13338, b: 12302, c: 663409, d: 0, total: 689049 },
             { age: 138, prem: 0, w: 0, a: 13809, b: 15269, c: 1111295, d: 0, total: 1140374 }
+        ];
+        
+        // 60歲退休數據 (3年供款, 每年 USD 38,217)
+        const data60 = [
+            { age: 61, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 62, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 63, prem: 38217, w: 0, a: 0, b: 0, c: 0, d: 0, total: 0 },
+            { age: 64, prem: 0, w: 0, a: 18501, b: 3210, c: 49338, d: 0, total: 71049 },
+            { age: 65, prem: 0, w: 0, a: 33642, b: 6446, c: 49529, d: 0, total: 89618 },
+            { age: 66, prem: 0, w: 0, a: 55911, b: 9707, c: 49720, d: 0, total: 115339 },
+            { age: 67, prem: 0, w: 0, a: 64032, b: 12995, c: 50905, d: 0, total: 127933 },
+            { age: 68, prem: 0, w: 0, a: 69106, b: 16310, c: 52204, d: 0, total: 137621 },
+            { age: 69, prem: 0, w: 0, a: 76128, b: 19650, c: 52357, d: 0, total: 148136 },
+            { age: 70, prem: 0, w: 0, a: 78651, b: 23018, c: 59924, d: 0, total: 161593 },
+            { age: 71, prem: 0, w: 18000, a: 86329, b: 8412, c: 60344, d: 0, total: 155086 },
+            { age: 72, prem: 0, w: 18000, a: 85102, b: 0, c: 61071, d: 0, total: 146173 },
+            { age: 73, prem: 0, w: 18000, a: 80743, b: 0, c: 59364, d: 0, total: 140108 },
+            { age: 74, prem: 0, w: 18000, a: 75419, b: 0, c: 58603, d: 0, total: 134023 },
+            { age: 75, prem: 0, w: 18000, a: 70692, b: 0, c: 59459, d: 0, total: 130152 },
+            { age: 76, prem: 0, w: 18000, a: 66382, b: 0, c: 58253, d: 0, total: 124636 },
+            { age: 77, prem: 0, w: 18000, a: 62421, b: 0, c: 56779, d: 0, total: 119200 },
+            { age: 78, prem: 0, w: 18000, a: 54714, b: 0, c: 59322, d: 0, total: 114037 },
+            { age: 79, prem: 0, w: 18000, a: 47588, b: 0, c: 61039, d: 0, total: 108627 },
+            { age: 80, prem: 0, w: 18000, a: 41037, b: 0, c: 62063, d: 0, total: 103101 },
+            { age: 81, prem: 0, w: 18000, a: 34844, b: 0, c: 57790, d: 0, total: 92634 },
+            { age: 82, prem: 0, w: 18000, a: 28927, b: 0, c: 52472, d: 0, total: 81399 },
+            { age: 83, prem: 0, w: 18000, a: 23351, b: 0, c: 47127, d: 0, total: 70479 },
+            { age: 84, prem: 0, w: 18000, a: 18103, b: 0, c: 40571, d: 0, total: 58675 },
+            { age: 85, prem: 0, w: 18000, a: 13169, b: 0, c: 32724, d: 0, total: 45893 },
+            { age: 86, prem: 0, w: 0, a: 13238, b: 358, c: 36437, d: 0, total: 50035 },
+            { age: 87, prem: 0, w: 0, a: 13312, b: 720, c: 40535, d: 0, total: 54568 },
+            { age: 88, prem: 0, w: 0, a: 13390, b: 1085, c: 47005, d: 0, total: 61481 },
+            { age: 89, prem: 0, w: 0, a: 13474, b: 1453, c: 51052, d: 0, total: 65979 },
+            { age: 90, prem: 0, w: 0, a: 13545, b: 1823, c: 55406, d: 0, total: 70775 },
+            { age: 91, prem: 0, w: 0, a: 13589, b: 2197, c: 60098, d: 0, total: 75884 },
+            { age: 92, prem: 0, w: 0, a: 13634, b: 2573, c: 65123, d: 0, total: 81332 },
+            { age: 93, prem: 0, w: 0, a: 13681, b: 2953, c: 70503, d: 0, total: 87138 },
+            { age: 94, prem: 0, w: 0, a: 13729, b: 3335, c: 76259, d: 0, total: 93324 },
+            { age: 95, prem: 0, w: 0, a: 13778, b: 3721, c: 82417, d: 0, total: 99917 },
+            { age: 96, prem: 0, w: 0, a: 13829, b: 4110, c: 88938, d: 0, total: 106878 },
+            { age: 97, prem: 0, w: 0, a: 13881, b: 4502, c: 96044, d: 0, total: 114428 },
+            { age: 98, prem: 0, w: 0, a: 13935, b: 4897, c: 103570, d: 0, total: 122402 },
+            { age: 99, prem: 0, w: 0, a: 13990, b: 5295, c: 111616, d: 0, total: 130902 },
+            { age: 100, prem: 0, w: 0, a: 14047, b: 5696, c: 120214, d: 0, total: 139958 },
+            { age: 110, prem: 0, w: 0, a: 14594, b: 9890, c: 245940, d: 0, total: 270426 },
+            { age: 120, prem: 0, w: 0, a: 15093, b: 14432, c: 486429, d: 0, total: 515954 },
+            { age: 130, prem: 0, w: 0, a: 15646, b: 19350, c: 942552, d: 0, total: 977550 },
+            { age: 138, prem: 0, w: 0, a: 16131, b: 23577, c: 1585382, d: 0, total: 1625091 }
         ];
 
         // 60歲傳承方案數據 (2年供款, 每年 USD 1,000,000)
@@ -743,12 +826,13 @@
           const [language, setLanguage] = useState('tc'); // 'tc', 'sc', 'en'
           const [currentView, setCurrentView] = useState('home');
           const [activeTab, setActiveTab] = useState('40');
+          const [activeSubTab50, setActiveSubTab50] = useState('5'); // '3' or '5' 新增 50歲子分頁狀態
           const [showDetails, setShowDetails] = useState(false);
           const [currency, setCurrency] = useState('USD');
           const [exchangeRate, setExchangeRate] = useState(7.8); 
           const [chartPeriod, setChartPeriod] = useState('active'); 
           const [animationStep, setAnimationStep] = useState(0);
-          const [isExporting, setIsExporting] = useState(false); // 新增匯出 PDF 狀態
+          const [isExporting, setIsExporting] = useState(false); 
           
           // --- IRR 計算器 狀態 ---
           const [irrPlanName, setIrrPlanName] = useState('盈聚天下II');
@@ -777,7 +861,6 @@
               wEndSurrender: 222418 
           });
 
-          // 取得當前語言字典
           const t = translations[language];
 
           useEffect(() => {
@@ -914,64 +997,73 @@
             setIrrWithdrawalOptions(newOptions);
           };
 
-          // --- 匯出 PDF 功能 ---
+         // --- 匯出 PDF 功能 ---
           const handleExportPDF = () => {
-              setIsExporting(true); // 設定為匯出中，用以隱藏匯出按鈕避免被截圖
+              const originalStyle = document.documentElement.style.scrollBehavior;
+              document.documentElement.style.scrollBehavior = 'auto';
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
               
-              // 給 React 渲染畫面（隱藏按鈕、展開表格）的時間
+              setIsExporting(true);
+              
               setTimeout(() => {
                   const element = document.getElementById('capture-area');
                   if (!element) {
                       setIsExporting(false);
+                      document.documentElement.style.scrollBehavior = originalStyle;
                       return;
                   }
 
+                  const exactWidth = element.scrollWidth;
+                  const exactHeight = element.scrollHeight;
+
                   window.html2canvas(element, {
-                      scale: 2, // 保持高解析度，確保文字清晰
+                      scale: 2, 
                       useCORS: true,
-                      backgroundColor: '#f8fafc'
+                      backgroundColor: '#f8fafc',
+                      width: exactWidth,
+                      height: exactHeight,
+                      windowWidth: exactWidth,
+                      windowHeight: exactHeight,
+                      x: 0,
+                      y: 0,
+                      scrollX: 0,
+                      scrollY: 0
                   }).then((canvas) => {
-                      // 1. 改用 JPEG 格式並設定品質為 0.95，可大幅減少檔案 MB 大小
                       const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                      
-                      // 2. 建立標準 A4 尺寸的 PDF (直向 portrait, 單位 pt, 格式 a4)
                       const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
-                      
-                      // 取得 A4 頁面的寬度與高度
                       const pdfWidth = pdf.internal.pageSize.getWidth();
                       const pdfHeight = pdf.internal.pageSize.getHeight();
-                      
-                      // 3. 計算圖片在 PDF 中的高度 (等比例縮放)
                       const imgHeightInPdf = (canvas.height * pdfWidth) / canvas.width;
                       
-                      let heightLeft = imgHeightInPdf; // 紀錄還有多少圖片高度還沒貼上
-                      let position = 0; // 紀錄圖片 Y 軸的起始位置
+                      let heightLeft = imgHeightInPdf; 
+                      let position = 0; 
 
-                      // 貼上第一頁
                       pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf);
                       heightLeft -= pdfHeight;
 
-                      // 4. 如果圖片高度大於一頁 A4，就跑迴圈繼續新增分頁
                       while (heightLeft > 0) {
-                          position -= pdfHeight; // 把圖片位置往上移一頁的高度
-                          pdf.addPage();         // 新增一頁 A4
+                          position -= pdfHeight; 
+                          pdf.addPage();         
                           pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeightInPdf);
                           heightLeft -= pdfHeight;
                       }
 
                       pdf.save(`FWD_Plan_${currentView}.pdf`);
                       setIsExporting(false);
+                      document.documentElement.style.scrollBehavior = originalStyle;
                   }).catch(err => {
                       console.error('PDF export failed:', err);
                       setIsExporting(false);
+                      document.documentElement.style.scrollBehavior = originalStyle;
                   });
-              }, 100); 
+              }, 800); 
           };
 
           // --- 數據處理 ---
           const currentRetirementData = activeTab === '30' ? data30 
                                       : activeTab === '40' ? data40 
-                                      : activeTab === '50' ? data50 
+                                      : activeTab === '50' ? (activeSubTab50 === '3' ? data50_3pay : data50) 
+                                      : activeTab === '60' ? data60
                                       : data55;
 
           const processedRetirementData = useMemo(() => {
@@ -1004,7 +1096,6 @@
             });
           }, []);
 
-          // --- 自訂比較資料運算 (簡化版) ---
           const compResultA = useMemo(() => {
               const premYears = planA.premEnd - planA.premStart + 1;
               const wYears = planA.wEnd - planA.wStart + 1;
@@ -1379,14 +1470,22 @@
           );
 
           const renderRetirement = () => {
-            const planDetails = {
+              const planDetails = {
               '30': { premAge: '31-35歲', accumAge: '36歲-60歲', accumYears: '25年', withdrawAge: '61歲至95歲', withdrawYears: '35年', withdrawalAmount: 27000 },
               '40': { premAge: '41-45歲', accumAge: '46歲-65歲', accumYears: '20年', withdrawAge: '66歲至95歲', withdrawYears: '30年', withdrawalAmount: 20000 },
-              '50': { premAge: '51-55歲', accumAge: '56歲-70歲', accumYears: '15年', withdrawAge: '71歲至95歲', withdrawYears: '25年', withdrawalAmount: 16000 },
-              '55': { premAge: '56-60歲', accumAge: '61歲-70歲', accumYears: '10年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 12000 }
+              '50_5': { premAge: '51-55歲', accumAge: '56歲-70歲', accumYears: '15年', withdrawAge: '71歲至95歲', withdrawYears: '25年', withdrawalAmount: 16000 },
+              '50_3': { premAge: '51-53歲', accumAge: '54歲-70歲', accumYears: '17年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 33000 },
+              '55': { premAge: '56-60歲', accumAge: '61歲-70歲', accumYears: '10年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 12000 },
+              '60': { premAge: '61-63歲', accumAge: '64歲-70歲', accumYears: '7年', withdrawAge: '71歲至90歲', withdrawYears: '20年', withdrawalAmount: 18000 }
             };
-            const currentDetails = planDetails[activeTab];
-            const headerSubtitle = `${activeTab}${t.age_man} | 5${t.prem_years} | ${parseInt(currentDetails.withdrawAge)}${t.withdraw_start} $${currentDetails.withdrawalAmount.toLocaleString()}`;
+          
+            const currentDetailsKey = activeTab === '50' ? `50_${activeSubTab50}` : activeTab;
+            const currentDetails = planDetails[currentDetailsKey];
+            
+            const premYearsCount = (activeTab === '50' && activeSubTab50 === '3') || activeTab === '60' ? 3 : 5;
+            const annualPremAmount = (activeTab === '50' && activeSubTab50 === '3') || activeTab === '60' ? 38217 : 13000;
+
+            const headerSubtitle = `${activeTab}${t.age_man} | ${premYearsCount}${t.prem_years} | ${parseInt(currentDetails.withdrawAge)}${t.withdraw_start} $${currentDetails.withdrawalAmount.toLocaleString()}`;
 
             const totalPremium = processedRetirementData[processedRetirementData.length - 1].cumulativePrem;
             const totalWithdrawn = processedRetirementData[processedRetirementData.length - 1].cumWithdrawal;
@@ -1395,9 +1494,9 @@
             const wStartAge = parseInt(currentDetails.withdrawAge.split('歲')[0]);
             const wEndAge = parseInt(currentDetails.withdrawAge.split('至')[1].replace('歲',''));
             const retPlanConfig = {
-                premAmount: 13000,
+                premAmount: annualPremAmount,
                 premStart: parseInt(activeTab) + 1,
-                premEnd: parseInt(activeTab) + 5,
+                premEnd: parseInt(activeTab) + premYearsCount,
                 wAmount: currentDetails.withdrawalAmount,
                 wStart: wStartAge,
                 wEnd: wEndAge,
@@ -1432,12 +1531,24 @@
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
-                      <div className="flex flex-wrap sm:flex-nowrap bg-slate-200 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
-                        {['30', '40', '50', '55'].map(tab => (
-                          <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-300/50'}`}>
-                            <Icon path={icons.Users} className="w-4 h-4" /> {tab}{language==='en'?'':'歲'}
-                          </button>
-                        ))}
+                      <div className="flex flex-col gap-2">
+                          <div className="flex flex-wrap sm:flex-nowrap bg-slate-200 p-1.5 rounded-xl w-full sm:w-auto shadow-inner">
+                              {['30', '40', '50', '55', '60'].map(tab => (
+                              <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === tab ? 'bg-white shadow text-blue-600' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-300/50'}`}>
+                                <Icon path={icons.Users} className="w-4 h-4" /> {tab}{language==='en'?'':'歲'}
+                              </button>
+                            ))}
+                          </div>
+                          {activeTab === '50' && (
+                              <div className="flex bg-blue-100 p-1 rounded-lg w-full sm:w-auto shadow-inner ml-auto border border-blue-200">
+                                <button onClick={() => setActiveSubTab50('3')} className={`flex-1 px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeSubTab50 === '3' ? 'bg-white shadow-sm text-blue-700' : 'text-blue-600/70 hover:bg-blue-200/50'}`}>
+                                    {language === 'en' ? '3-yr Pay' : (language === 'sc' ? '3年供款' : '3年供款')}
+                                </button>
+                                <button onClick={() => setActiveSubTab50('5')} className={`flex-1 px-4 py-1.5 text-xs font-bold rounded-md transition-all ${activeSubTab50 === '5' ? 'bg-white shadow-sm text-blue-700' : 'text-blue-600/70 hover:bg-blue-200/50'}`}>
+                                    {language === 'en' ? '5-yr Pay' : (language === 'sc' ? '5年供款' : '5年供款')}
+                                </button>
+                              </div>
+                          )}
                       </div>
                       <button onClick={() => setCurrency(currency === 'USD' ? 'HKD' : 'USD')} className="flex w-full sm:w-auto justify-center items-center bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 transition-colors cursor-pointer">
                         <Icon path={icons.RefreshCw} className={`w-5 h-5 text-blue-500 mr-2 ${currency === 'HKD' ? 'rotate-180' : ''} transition-transform duration-500`} />
@@ -1459,9 +1570,9 @@
                       </div>
                       <div className="text-3xl font-bold text-slate-900">{formatCurrency(totalPremium)}</div>
                       <div className="mt-3 space-y-1">
-                        <p className="text-sm text-slate-500">{t.first}5{t.years} ({parseInt(activeTab)+1}-{parseInt(activeTab)+5}歲) {t.every_year} {formatCurrency(13000)}</p>
+                        <p className="text-sm text-slate-500">{t.first}{premYearsCount}{t.years} ({parseInt(activeTab)+1}-{parseInt(activeTab)+premYearsCount}歲) {t.every_year} {formatCurrency(annualPremAmount)}</p>
                         <p className="text-sm text-slate-500 bg-slate-50 py-1 px-2 rounded-md inline-block">
-                          {parseInt(activeTab)+6}歲-{parseInt(currentDetails.withdrawAge)-1}歲{t.accum_period} <span className="text-red-500 font-bold">{parseInt(currentDetails.withdrawAge)-parseInt(activeTab)-6}{t.years}</span>
+                          {parseInt(activeTab)+premYearsCount+1}歲-{parseInt(currentDetails.withdrawAge)-1}歲{t.accum_period} <span className="text-red-500 font-bold">{parseInt(currentDetails.withdrawAge)-parseInt(activeTab)-premYearsCount-1}{t.years}</span>
                         </p>
                       </div>
                     </div>
@@ -1495,7 +1606,7 @@
                     </div>
                   </div>
 
-                  {/* 新增: 退休方案動態時間軸 */}
+                  {/* 退休方案動態時間軸 */}
                   <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200 overflow-hidden">
                       {renderTimeline(retPlanConfig, retCompResult)}
                   </div>
@@ -2158,7 +2269,7 @@
             );
           };
 
-          const renderLegacyAnimation = () => {
+  const renderLegacyAnimation = () => {
             const steps = [
               {
                 title: t.anim_step0_title,
